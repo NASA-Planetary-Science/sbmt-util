@@ -2,6 +2,7 @@ package edu.jhuapl.sbmt.util.gravity;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import vtk.vtkIdList;
 import vtk.vtkPolyData;
@@ -53,9 +54,9 @@ public class GravityWerner extends Gravity {
         double r_mag;
     }
 
-    private ArrayList<EdgeData> edgeData = new ArrayList<EdgeData>();
-    private ArrayList<FaceData> faceData = new ArrayList<FaceData>();
-    private ArrayList<Point> pointCache = new ArrayList<Point>();
+    private List<EdgeData> edgeData = new ArrayList<EdgeData>();
+    private List<FaceData> faceData = new ArrayList<FaceData>();
+    private List<Point> pointCache = new ArrayList<Point>();
 
     private static void addMatrices(double[][] a, double[][] b, double[][] c) {
         for (int i = 0; i < 3; ++i)

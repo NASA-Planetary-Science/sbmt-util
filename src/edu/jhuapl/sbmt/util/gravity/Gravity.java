@@ -328,14 +328,14 @@ abstract public class Gravity {
         out.write(lineSeparator);
 
 
-        ArrayList<Point3D> xyzPointList = lin.xyzPointList;
+        List<Point3D> xyzPointList = lin.xyzPointList;
 
         // Run the gravity program
-        ArrayList<Double> elevation = new ArrayList<Double>();
-        ArrayList<Double> accelerationMagnitude = new ArrayList<Double>();
-        ArrayList<Point3D> accelerationVector = new ArrayList<Point3D>();
-        ArrayList<Double> potential = new ArrayList<Double>();
-        ArrayList<double[]> pointList = new ArrayList<double[]>();
+        List<Double> elevation = new ArrayList<Double>();
+        List<Double> accelerationMagnitude = new ArrayList<Double>();
+        List<Point3D> accelerationVector = new ArrayList<Point3D>();
+        List<Double> potential = new ArrayList<Double>();
+        List<double[]> pointList = new ArrayList<double[]>();
         for (Point3D p : lin.xyzPointList)
             pointList.add(p.xyz);
         Gravity.getGravityAtPoints(
@@ -839,7 +839,7 @@ abstract public class Gravity {
     }
 
     private List<GravityValues> getGravityAtPlateCenters(int startId, int endId) {
-        ArrayList<GravityValues> results = new ArrayList<GravityValues>();
+        List<GravityValues> results = new ArrayList<GravityValues>();
 
         vtkIdList idList = new vtkIdList();
 
@@ -880,7 +880,7 @@ abstract public class Gravity {
     }
 
     private List<GravityValues> getGravityAtShapeModelVertices(int startId, int endId) {
-        ArrayList<GravityValues> results = new ArrayList<GravityValues>();
+        List<GravityValues> results = new ArrayList<GravityValues>();
 
         for (int i = startId; i < endId; ++i) {
             double[] pt = new double[3];
@@ -908,7 +908,7 @@ abstract public class Gravity {
     }
 
     private List<GravityValues> getGravityAtPoints() {
-        ArrayList<GravityValues> results = new ArrayList<GravityValues>();
+        List<GravityValues> results = new ArrayList<GravityValues>();
 
         for (int i = 0; i < pointsToComputeGravity.size(); ++i) {
             double[] pt = pointsToComputeGravity.get(i);
@@ -950,7 +950,7 @@ abstract public class Gravity {
         });
 
         // Convert 2D array to List
-        ArrayList<GravityValues> results = new ArrayList<GravityValues>();
+        List<GravityValues> results = new ArrayList<GravityValues>();
         int numCols = gridToComputeGravity[0].length;
         for (int m = 0; m < numRows; ++m)
             for (int n = 0; n < numCols; ++n) {

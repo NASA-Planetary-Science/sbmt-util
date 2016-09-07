@@ -42,7 +42,7 @@ public class Bigmap
 
         String execDir = bigmapRootDir;
 
-        ArrayList<String> processCommand = new ArrayList<String>();
+        List<String> processCommand = new ArrayList<String>();
 
         processBuilder = new ProcessBuilder(processCommand);
 

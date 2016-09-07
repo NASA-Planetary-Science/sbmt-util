@@ -6,7 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutionException;
@@ -84,7 +84,7 @@ public class DistributedGravityBatchSubmission {
         return exitStatus == 0;
     }
 
-    private static boolean runBatchSubmitProgramGridEngine(ArrayList<String> commandList, String workingDir) throws InterruptedException,
+    private static boolean runBatchSubmitProgramGridEngine(List<String> commandList, String workingDir) throws InterruptedException,
             IOException {
         // Create a text file for input to qsub making use of qsub's job array
         // option
@@ -133,7 +133,7 @@ public class DistributedGravityBatchSubmission {
      * @throws InterruptedException
      * @throws IOException
      */
-    private static boolean runBatchSubmitProgramGridEngineLimitSlots(ArrayList<String> commandList, String workingDir, BatchType batchType)
+    private static boolean runBatchSubmitProgramGridEngineLimitSlots(List<String> commandList, String workingDir, BatchType batchType)
             throws InterruptedException,
             IOException {
         // Create a text file for input to qsub making use of qsub's job array
@@ -177,7 +177,7 @@ public class DistributedGravityBatchSubmission {
         return success;
     }
 
-    private static boolean runBatchSubmitProgramParallel(ArrayList<String> commandList) throws InterruptedException,
+    private static boolean runBatchSubmitProgramParallel(List<String> commandList) throws InterruptedException,
             IOException {
         // Create a text file with all the commands that should be run, one per
         // line
@@ -190,7 +190,7 @@ public class DistributedGravityBatchSubmission {
         return runProgramAndWait(batchSubmitCommand);
     }
 
-    private static boolean runBatchSubmitProgramLocalMake(ArrayList<String> commandList) throws InterruptedException,
+    private static boolean runBatchSubmitProgramLocalMake(List<String> commandList) throws InterruptedException,
             IOException {
         // Create a Makefile and run the tasks in parallel with the -j option
         File temp = File.createTempFile("altwg-batch-list", ".tmp", null);
@@ -214,7 +214,7 @@ public class DistributedGravityBatchSubmission {
         return runProgramAndWait(batchSubmitCommand);
     }
 
-    private static boolean runBatchSubmitProgramLocalParallel(ArrayList<String> commandList, final String workingDir) throws IOException,
+    private static boolean runBatchSubmitProgramLocalParallel(List<String> commandList, final String workingDir) throws IOException,
             InterruptedException {
         int cores = Runtime.getRuntime().availableProcessors();
         ExecutorService executor = Executors.newFixedThreadPool(cores);
@@ -250,7 +250,7 @@ public class DistributedGravityBatchSubmission {
         return successful.get();
     }
 
-    private static boolean runBatchSubmitProgramLocalSequential(ArrayList<String> commandList, String workingDir) throws IOException,
+    private static boolean runBatchSubmitProgramLocalSequential(List<String> commandList, String workingDir) throws IOException,
             InterruptedException {
         boolean successful = true;
         for (String command : commandList) {
@@ -267,7 +267,7 @@ public class DistributedGravityBatchSubmission {
         return successful;
     }
 
-    public static boolean runBatchSubmitinDir(ArrayList<String> commandList, String workingDir, BatchType batchType) throws InterruptedException, IOException {
+    public static boolean runBatchSubmitinDir(List<String> commandList, String workingDir, BatchType batchType) throws InterruptedException, IOException {
 
         switch (batchType) {
         case GRID_ENGINE:
@@ -318,7 +318,7 @@ public class DistributedGravityBatchSubmission {
         }
     }
 
-    public static boolean runBatchSubmitPrograms(ArrayList<String> commandList, BatchType batchType)
+    public static boolean runBatchSubmitPrograms(List<String> commandList, BatchType batchType)
             throws InterruptedException, IOException {
 
         boolean result = runBatchSubmitinDir(commandList, null, batchType);
@@ -345,7 +345,7 @@ public class DistributedGravityBatchSubmission {
     }
 
     // twupy1: Added for integration with SBMT
-    public static boolean runBatchSubmitPrograms(ArrayList<String> commandList, String rootDir, BatchType batchType)
+    public static boolean runBatchSubmitPrograms(List<String> commandList, String rootDir, BatchType batchType)
             throws InterruptedException, IOException {
 
         boolean result = runBatchSubmitinDir(commandList, rootDir, batchType);

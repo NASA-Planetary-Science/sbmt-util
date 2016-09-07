@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.jhuapl.sbmt.model.image.Image.ImageKey;
-
 import nom.tam.fits.HeaderCard;
+
+import edu.jhuapl.sbmt.model.image.Image.ImageKey;
 
 /**
  * Container class for storing the metadata that we'd like to put into the Backplanes PDS4 XML

@@ -7,7 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutionException;
@@ -65,7 +65,7 @@ public class BatchSubmission
         return exitStatus == 0;
     }
 
-    private static boolean runBatchSubmitProgramGridEngine(ArrayList<String> commandList) throws InterruptedException, IOException
+    private static boolean runBatchSubmitProgramGridEngine(List<String> commandList) throws InterruptedException, IOException
     {
         // Create a text file for input to qsub making use of qsub's job array option
         File temp = File.createTempFile("altwg-batch-list", ".bash", null);
@@ -81,7 +81,7 @@ public class BatchSubmission
         return runProgramAndWait(batchSubmitCommand);
     }
 
-    private static boolean runBatchSubmitProgramParallel(ArrayList<String> commandList) throws InterruptedException, IOException
+    private static boolean runBatchSubmitProgramParallel(List<String> commandList) throws InterruptedException, IOException
     {
         // Create a text file with all the commands that should be run, one per
         // line
@@ -94,7 +94,7 @@ public class BatchSubmission
         return runProgramAndWait(batchSubmitCommand);
     }
 
-    private static boolean runBatchSubmitProgramLocalParallel(ArrayList<String> commandList) throws IOException, InterruptedException
+    private static boolean runBatchSubmitProgramLocalParallel(List<String> commandList) throws IOException, InterruptedException
     {
         int cores = Runtime.getRuntime().availableProcessors();
         ExecutorService executor = Executors.newFixedThreadPool(cores);
@@ -140,7 +140,7 @@ public class BatchSubmission
         return successful.get();
     }
 
-    private static boolean runBatchSubmitProgramLocalSequential(ArrayList<String> commandList) throws IOException, InterruptedException
+    private static boolean runBatchSubmitProgramLocalSequential(List<String> commandList) throws IOException, InterruptedException
     {
         boolean successful = true;
         for (String command : commandList)
@@ -152,7 +152,7 @@ public class BatchSubmission
         return successful;
     }
 
-    public static boolean runBatchSubmitPrograms(ArrayList<String> commandList, BatchType batchType) throws InterruptedException, IOException
+    public static boolean runBatchSubmitPrograms(List<String> commandList, BatchType batchType) throws InterruptedException, IOException
     {
         if (batchType == BatchType.GRID_ENGINE)
             return runBatchSubmitProgramGridEngine(commandList);

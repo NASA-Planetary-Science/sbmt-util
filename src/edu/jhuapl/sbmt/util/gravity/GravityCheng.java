@@ -1,6 +1,7 @@
 package edu.jhuapl.sbmt.util.gravity;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import vtk.vtkIdList;
 import vtk.vtkPolyData;
@@ -28,8 +29,8 @@ public class GravityCheng extends Gravity {
         double[] point = new double[3];
     }
 
-    private ArrayList<FaceData> faceData = new ArrayList<FaceData>();
-    private ArrayList<Point> pointCache = new ArrayList<Point>();
+    private List<FaceData> faceData = new ArrayList<FaceData>();
+    private List<Point> pointCache = new ArrayList<Point>();
 
     public GravityCheng(vtkPolyData polyData) {
         super(polyData);

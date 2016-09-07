@@ -7,16 +7,17 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-
-import edu.jhuapl.saavtk.util.Configuration;
-import edu.jhuapl.saavtk.util.FileUtil;
 
 import nom.tam.fits.BasicHDU;
 import nom.tam.fits.Fits;
 import nom.tam.fits.FitsException;
 import nom.tam.fits.FitsFactory;
 import nom.tam.util.BufferedFile;
+
+import edu.jhuapl.saavtk.util.Configuration;
+import edu.jhuapl.saavtk.util.FileUtil;
 
 
 public class Mapmaker
@@ -41,7 +42,7 @@ public class Mapmaker
 
         String execDir = mapmakerRootDir + File.separator + "EXECUTABLES";
 
-        ArrayList<String> processCommand = new ArrayList<String>();
+        List<String> processCommand = new ArrayList<String>();
 
         processBuilder = new ProcessBuilder(processCommand);
 
