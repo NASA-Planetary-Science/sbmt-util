@@ -35,7 +35,7 @@ public class ImageGalleryGenerator
         // Generate the image gallery
         try
         {
-            String galleryName = "Search Result Image Gallery (Auto-Generated on " +
+            String galleryName = "Search Results Image Gallery (Auto-Generated on " +
                 new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()) + ")";
             generateGalleryHTML(galleryURL,galleryName,entries);
         }
@@ -147,9 +147,9 @@ public class ImageGalleryGenerator
         for(ImageGalleryEntry entry : entries)
         {
             writer.println("<li><a href=\"" +
-                Configuration.getDataRootURL() + "/" + entry.imageFilename +
+                Configuration.getDataRootURL() + entry.imageFilename +
                 "\" class=\"preview\" title=\"" + entry.caption + "\"><img src=\"" +
-                Configuration.getDataRootURL() + "/" + entry.previewFilename +
+                Configuration.getDataRootURL() + entry.previewFilename +
                 "\" alt=\"gallery thumbnail\" /></a></li>");
         }
         writer.println("</ul>");
