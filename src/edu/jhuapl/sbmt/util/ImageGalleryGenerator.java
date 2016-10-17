@@ -3,6 +3,8 @@ package edu.jhuapl.sbmt.util;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import edu.jhuapl.saavtk.util.Configuration;
@@ -33,7 +35,9 @@ public class ImageGalleryGenerator
         // Generate the image gallery
         try
         {
-            generateGalleryHTML(galleryURL,"Search Result Image Gallery",entries);
+            String galleryName = "Search Result Image Gallery (Auto-Generated on " +
+                new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()) + ")";
+            generateGalleryHTML(galleryURL,galleryName,entries);
         }
         catch(Exception e)
         {
