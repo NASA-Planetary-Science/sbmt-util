@@ -1,10 +1,12 @@
 package edu.jhuapl.sbmt.util.nis;
 
+import java.nio.file.Paths;
+
 public class Test
 {
     public static void main(String[] args)
     {
-        NisDataSource data=new NisDataSource();
+        NisDataSource data=new NisDataSource(Paths.get(args[2]));
         data.setResolutionLevel(Integer.valueOf(args[1]));
         //
         NisProcessor processor=new NisProcessor(data, args[0]);
