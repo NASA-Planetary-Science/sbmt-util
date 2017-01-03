@@ -49,11 +49,11 @@ public class NisPhaseCurveHistogram extends RegularHistogram2D
     public static void main(String[] args)
     {
         int resolutionLevel=0;
-        NisDataSource data=new NisDataSource(Paths.get("/Volumes/freeman 1.8TB/sbmt/NIS/2000"));
+        NisDataSource data=new NisDataSource(Paths.get("/Volumes/freeman1.8TB/sbmt/NIS/2000"));
         data.setResolutionLevel(resolutionLevel);
 
         String[] subDirs=new String[]{"011","019","020","025","029","031","032","036","037","038","041","042","043","044","045","046","047","048","049","050","051","052","053","054","055","056","057","058","059","063","065","066","070","074","075","076","077","079","080","081","086","088","089","090","091","092","093","095","096","097","098","099","100","101","102","103","104","105","106","107","108","111","112","113","114","115","116","117","118","119","120","121","122","123","124","125","126","127","128","129","130","131","132","133","134"};
-        NisPhaseCurveHistogram histogram=new NisPhaseCurveHistogram(360, 200, 50);
+        NisPhaseCurveHistogram histogram=new NisPhaseCurveHistogram(720, 400, 50);
         for (int i=0; i<subDirs.length; i++)
         {
             Path filePath=data.basePath.resolve(subDirs[i]).resolve("faceSamples."+resolutionLevel+".dat");
