@@ -75,6 +75,11 @@ public class NisDataSource
         return erosModel.getModelResolution();
     }
 
+    public SmallBodyModel getSmallBodyModel()
+    {
+        return erosModel;
+    }
+
     public Set<NisTime> getAllObservationTimes()
     {
         return timeToFileMap.keySet();
