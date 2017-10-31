@@ -23,7 +23,7 @@ import edu.jhuapl.saavtk.util.NativeLibraryLoader;
 import edu.jhuapl.sbmt.client.SbmtModelFactory;
 import edu.jhuapl.sbmt.client.SmallBodyModel;
 import edu.jhuapl.sbmt.client.SmallBodyViewConfig;
-import edu.jhuapl.sbmt.gui.eros.NISSearchPanel;
+import edu.jhuapl.sbmt.gui.eros.SpectrumSearchPanel;
 import edu.jhuapl.sbmt.model.eros.NISSpectrum;
 
 public class NisDataSource
@@ -142,7 +142,7 @@ public class NisDataSource
 
     public Vector3D getToSunVector(NisTime time)
     {
-        return NISSearchPanel.getToSunUnitVector(timeToFileMap.get(time));
+        return SpectrumSearchPanel.getToSunUnitVector(timeToFileMap.get(time));
     }
 
     public String[] getAllDirectories()

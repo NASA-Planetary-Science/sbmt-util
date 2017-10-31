@@ -6,11 +6,12 @@ import java.io.IOException;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
-import edu.jhuapl.sbmt.model.eros.NISSpectrum;
+import edu.jhuapl.sbmt.model.eros.NIS;
 
 public class NisSample
 {
-    public static int spectrumLength=NISSpectrum.bandCenters.length;
+    final static NIS nis=new NIS();
+    public static int spectrumLength=nis.getBandCenters().length;
     public static int timeStringLength=23;
 
     int faceId;
