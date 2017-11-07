@@ -12,6 +12,8 @@ import edu.jhuapl.saavtk.util.VtkDataTypes;
 
 public class ImageDataUtil
 {
+    public static final float FILL_CUTOFF = 1.e32f;
+
     /**
      * Helper function to create raw vtkImageData from float array
      *
@@ -20,8 +22,9 @@ public class ImageDataUtil
      * @param array3D A matrix of floats with dimensions (height, depth, width) or null
      * @param minValue Float array of length depth where min values at each layer will be stored
      * @param maxValue Float array of length depth where max values at each layer will be stored
+     * @param fillDetector An object that identifies filler values, i.e., values that should not be displayed.
      */
-    public static vtkImageData createRawImage(int height, int width, int depth, boolean transpose, float[][] array2D, float[][][] array3D, float[] minValue, float[] maxValue)
+    public static vtkImageData createRawImage(int height, int width, int depth, boolean transpose, float[][] array2D, float[][][] array3D, float[] minValue, float[] maxValue, FillDetector<Float> fillDetector)
     {
         vtkImageData image = new vtkImageData();
         if (transpose)
@@ -53,12 +56,20 @@ public class ImageDataUtil
                     else if (array3D != null)
                         value = array3D[i][k][j];
 
+                    // Convert "fill" values to NaN.
+                    if (fillDetector.isFill(value))
+                        value = Float.NaN;
+
                     if (transpose)
                         //image.SetScalarComponentFromDouble(j, height-1-i, k, 0, value);
                         array1D[(k * height + (height-1-i)) * width + j] = value;
                     else
                         //image.SetScalarComponentFromDouble(i, width-1-j, k, 0, value);
                         array1D[(k * width + (width-1-j)) * height + i] = value;
+
+                    // Detect NaN and don't consider it for min/max value.
+                    if (!Float.isFinite(value))
+                        continue;
 
                     if (value > maxValue[k])
                         maxValue[k] = value;
@@ -74,14 +85,43 @@ public class ImageDataUtil
     /**
      * Same as method above but without storing min and max values
      */
-    public static vtkImageData createRawImage(int height, int width, int depth, boolean transpose, float[][] array2D, float[][][] array3D)
+    public static vtkImageData createRawImage(int height, int width, int depth, boolean transpose, float[][] array2D, float[][][] array3D, FillDetector<Float> fillDetector)
     {
         // Unused
         float[] minValue = new float[depth];
         float[] maxValue = new float[depth];
 
         // Call helper
-        return createRawImage(height, width, depth, transpose, array2D, array3D, minValue, maxValue);
+        return createRawImage(height, width, depth, transpose, array2D, array3D, minValue, maxValue, fillDetector);
+    }
+
+    /**
+     * Same as methods above but with default fill detection.
+     */
+    public static vtkImageData createRawImage(int height, int width, int depth, boolean transpose, float[][] array2D, float[][][] array3D, float[] minValue, float[] maxValue)
+    {
+        return createRawImage(height, width, depth, transpose, array2D, array3D, minValue, maxValue, getDefaultFillDetector());
+    }
+
+    /**
+     * Same as methods above but with default fill detection.
+     */
+    public static vtkImageData createRawImage(int height, int width, int depth, boolean transpose, float[][] array2D, float[][][] array3D)
+    {
+        return createRawImage(height, width, depth, transpose, array2D, array3D, getDefaultFillDetector());
+    }
+
+
+    public static FillDetector<Float> getDefaultFillDetector() {
+        return new FillDetector<Float>() {
+
+            @Override
+            public boolean isFill(Float value)
+            {
+                return Float.compare(value, FILL_CUTOFF) >= 0 || Float.compare(value, -FILL_CUTOFF) <= 0;
+            }
+
+        };
     }
 
 
@@ -130,8 +170,8 @@ public class ImageDataUtil
                         int index = k * width * height + j * width + i;
 //                        char value = (char)data.GetValue(index);
 //                        int ivalue = (int)value;
-                        int ivalue = (int)data.GetValue(index);
-                        array[k][j][i] = ((float)ivalue) / 255.0F;
+                        int ivalue = data.GetValue(index);
+                        array[k][j][i] = (ivalue) / 255.0F;
                     }
                 }
             }
