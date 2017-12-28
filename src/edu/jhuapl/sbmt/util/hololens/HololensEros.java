@@ -18,7 +18,7 @@ import vtk.vtkPolyDataWriter;
 import edu.jhuapl.saavtk.colormap.Colormap;
 import edu.jhuapl.saavtk.colormap.Colormaps;
 import edu.jhuapl.saavtk.model.ColoringInfo;
-import edu.jhuapl.saavtk.model.ShapeModelAuthor;
+import edu.jhuapl.saavtk.model.ShapeModelType;
 import edu.jhuapl.saavtk.model.ShapeModelBody;
 import edu.jhuapl.saavtk.util.ObjUtil;
 import edu.jhuapl.sbmt.client.SbmtModelFactory;
@@ -38,7 +38,7 @@ public class HololensEros
     {
         int coloringIndex=2; // at the time of implementation index 2 is point-centered elevation data
 
-        SmallBodyViewConfig config=SmallBodyViewConfig.getSmallBodyConfig(ShapeModelBody.EROS, ShapeModelAuthor.GASKELL);
+        SmallBodyViewConfig config=SmallBodyViewConfig.getSmallBodyConfig(ShapeModelBody.EROS, ShapeModelType.GASKELL);
         SmallBodyModel erosModel = SbmtModelFactory.createSmallBodyModel(config);
         erosModel.setColoringIndex(coloringIndex);
         double[] coloringRange=erosModel.getCurrentColoringRange(coloringIndex);

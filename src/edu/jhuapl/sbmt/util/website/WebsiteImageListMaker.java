@@ -11,7 +11,7 @@ import java.util.TimeZone;
 import com.google.common.collect.Lists;
 
 import edu.jhuapl.saavtk.config.ViewConfig;
-import edu.jhuapl.saavtk.model.ShapeModelAuthor;
+import edu.jhuapl.saavtk.model.ShapeModelType;
 import edu.jhuapl.saavtk.model.ShapeModelBody;
 import edu.jhuapl.sbmt.client.SmallBodyViewConfig;
 import edu.jhuapl.sbmt.model.image.ImageSource;
@@ -32,51 +32,51 @@ public class WebsiteImageListMaker
             System.out.println(tables.get(i));
 
         List<ShapeModelBody> bodies=Lists.newArrayList();
-        List<ShapeModelAuthor> authors=Lists.newArrayList();
+        List<ShapeModelType> authors=Lists.newArrayList();
         List<String> versions=Lists.newArrayList();
 
         bodies.add(ShapeModelBody.EROS);
-        authors.add(ShapeModelAuthor.GASKELL);
+        authors.add(ShapeModelType.GASKELL);
         versions.add("");
 
         bodies.add(ShapeModelBody.ITOKAWA);
-        authors.add(ShapeModelAuthor.GASKELL);
+        authors.add(ShapeModelType.GASKELL);
         versions.add("");
 
        bodies.add( ShapeModelBody.VESTA);
-       authors.add(ShapeModelAuthor.GASKELL);
+       authors.add(ShapeModelType.GASKELL);
        versions.add("");
 
        bodies.add(ShapeModelBody.CERES);
-       authors.add(ShapeModelAuthor.GASKELL);
+       authors.add(ShapeModelType.GASKELL);
        versions.add("");
 
        bodies.add(ShapeModelBody.DEIMOS);
-       authors.add(ShapeModelAuthor.THOMAS);
+       authors.add(ShapeModelType.THOMAS);
        versions.add("");
 
        bodies.add(ShapeModelBody.PHOBOS);
-       authors.add(ShapeModelAuthor.GASKELL);
+       authors.add(ShapeModelType.GASKELL);
        versions.add("");
 
        bodies.add(ShapeModelBody.PHOBOS);
-       authors.add(ShapeModelAuthor.EXPERIMENTAL);
+       authors.add(ShapeModelType.EXPERIMENTAL);
        versions.add("");
 
         bodies.add(ShapeModelBody._67P);
-        authors.add(ShapeModelAuthor.GASKELL);
+        authors.add(ShapeModelType.GASKELL);
         versions.add("SHAP5 V0.3");
 
         bodies.add(ShapeModelBody._67P);
-        authors.add(ShapeModelAuthor.DLR);
+        authors.add(ShapeModelType.DLR);
         versions.add("SHAP4S");
 
         bodies.add(ShapeModelBody._67P);
-        authors.add(ShapeModelAuthor.GASKELL);
+        authors.add(ShapeModelType.GASKELL);
         versions.add("V2");
 
         bodies.add(ShapeModelBody._67P);
-        authors.add(ShapeModelAuthor.GASKELL);
+        authors.add(ShapeModelType.GASKELL);
         versions.add("V3");
 
         bodies.add(ShapeModelBody.JUPITER);
@@ -100,11 +100,11 @@ public class WebsiteImageListMaker
         versions.add("");
 
         bodies.add(ShapeModelBody.RQ36);
-        authors.add(ShapeModelAuthor.GASKELL);
+        authors.add(ShapeModelType.GASKELL);
         versions.add("V3 Image");
 
         bodies.add(ShapeModelBody.RQ36);
-        authors.add(ShapeModelAuthor.GASKELL);
+        authors.add(ShapeModelType.GASKELL);
         versions.add("V3 Image");
 
 //        RQ36V4_MAP(SmallBodyConfig.getSmallBodyConfig(ShapeModelBody.RQ36, ShapeModelAuthor.GASKELL, "V4 Image"),
