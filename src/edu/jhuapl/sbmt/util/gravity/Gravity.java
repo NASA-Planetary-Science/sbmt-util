@@ -12,8 +12,6 @@ import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-import altwg.util.FitsUtil;
-
 import vtk.vtkAbstractPointLocator;
 import vtk.vtkIdList;
 import vtk.vtkPointLocator;
@@ -29,6 +27,8 @@ import edu.jhuapl.sbmt.client.SmallBodyModel;
 import edu.jhuapl.sbmt.util.PolyDataUtil2;
 import edu.jhuapl.sbmt.util.gravity.ParallelGrid.GridFunction;
 import edu.jhuapl.sbmt.util.gravity.ParallelLoop.LoopFunction;
+
+import altwg.util.FitsUtil;
 
 /**
  * Gravity program. This the abstract base class for computing gravity values
@@ -563,7 +563,7 @@ abstract public class Gravity {
                 + "Tilt (deg),Mean Tilt (deg),Stdev Tilt (deg)\n");
 
         vtkIdList idList = new vtkIdList();
-        SmallBodyModel smallBodyModel = new SmallBodyModel(polydata);
+        SmallBodyModel smallBodyModel = new SmallBodyModel(csvfile, polydata);
 
         int numPoints = polydata.GetNumberOfPoints();
         for (int i = 0; i < numPoints; ++i) {
@@ -675,7 +675,7 @@ abstract public class Gravity {
 
         double[][][] outdata = new double[19][axes[1]][axes[2]];
         vtkIdList idList = new vtkIdList();
-        SmallBodyModel smallBodyModel = new SmallBodyModel(fitspolydata);
+        SmallBodyModel smallBodyModel = new SmallBodyModel(outputfitsfile, fitspolydata);
 
         double[] pt = new double[3];
         double[] normal = new double[3];
