@@ -17,9 +17,9 @@ import vtk.vtkPolyDataWriter;
 
 import edu.jhuapl.saavtk.colormap.Colormap;
 import edu.jhuapl.saavtk.colormap.Colormaps;
-import edu.jhuapl.saavtk.model.ColoringInfo;
-import edu.jhuapl.saavtk.model.ShapeModelType;
+import edu.jhuapl.saavtk.model.ColoringData;
 import edu.jhuapl.saavtk.model.ShapeModelBody;
+import edu.jhuapl.saavtk.model.ShapeModelType;
 import edu.jhuapl.saavtk.util.ObjUtil;
 import edu.jhuapl.sbmt.client.SbmtModelFactory;
 import edu.jhuapl.sbmt.client.SmallBodyModel;
@@ -41,7 +41,6 @@ public class HololensEros
         SmallBodyViewConfig config=SmallBodyViewConfig.getSmallBodyConfig(ShapeModelBody.EROS, ShapeModelType.GASKELL);
         SmallBodyModel erosModel = SbmtModelFactory.createSmallBodyModel(config);
         erosModel.setColoringIndex(coloringIndex);
-        double[] coloringRange=erosModel.getCurrentColoringRange(coloringIndex);
 
         Colormap colormap=Colormaps.getNewInstanceOfBuiltInColormap("Spectral_lowBlue");
         colormap.setRangeMin(0);
@@ -59,12 +58,19 @@ public class HololensEros
         reader.SetFileName(pngPath.toString());
         reader.Update();
 
-        ColoringInfo info=erosModel.getColoringInfoList().get(coloringIndex);
+        // 2018-05-22 This code block was modified to work with the new classes
+        // ColoringData and ColoringDataManager instead of the now removed ColoringInfo class.
+        // However, because of other runtime errors, these changes were not tested. If this code
+        // is used again, there may be side-effects, but that should turn up in routine testing.
+        int numberElements = erosModel.getSmallBodyPolyData().GetNumberOfCells();
+        ColoringData coloringData = erosModel.getColoringDataManager().get(numberElements).get(coloringIndex);
+        coloringData.load();
+        double[] coloringRange=coloringData.getDefaultRange();
         vtkDoubleArray values=new vtkDoubleArray();
         values.SetName("values");
-        for (int i=0; i<erosModel.getSmallBodyPolyData().GetNumberOfCells(); i++)
+        for (int i=0; i<numberElements; i++)
         {
-            double scaledValue=(info.coloringValues.GetTuple1(i)-coloringRange[0])/(coloringRange[1]-coloringRange[0]);
+            double scaledValue=(coloringData.getData().GetTuple1(i)-coloringRange[0])/(coloringRange[1]-coloringRange[0]);
             if (scaledValue<0)
                 scaledValue=0;
             if (scaledValue>1)
