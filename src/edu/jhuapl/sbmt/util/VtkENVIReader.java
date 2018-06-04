@@ -13,6 +13,8 @@ import java.util.HashMap;
 import vtk.vtkImageData;
 import vtk.vtkImageReader2;
 
+import edu.jhuapl.saavtk.util.ImageDataUtil;
+
 // This class was written to be used like vtkPNGReader but
 // only for converting ENVI format files to vtkImageData
 // Note: ENVI format image = binary + .hdr file
