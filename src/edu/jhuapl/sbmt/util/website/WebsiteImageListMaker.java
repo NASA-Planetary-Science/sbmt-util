@@ -16,7 +16,7 @@ import edu.jhuapl.saavtk.model.ShapeModelBody;
 import edu.jhuapl.sbmt.client.SmallBodyViewConfig;
 import edu.jhuapl.sbmt.model.image.ImageSource;
 import edu.jhuapl.sbmt.model.image.ImagingInstrument;
-import edu.jhuapl.sbmt.query.GenericPhpQuery;
+import edu.jhuapl.sbmt.query.database.GenericPhpQuery;
 import edu.jhuapl.sbmt.tools.SqlManager;
 
 
