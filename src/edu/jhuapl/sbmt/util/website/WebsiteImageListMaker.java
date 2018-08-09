@@ -11,8 +11,8 @@ import java.util.TimeZone;
 import com.google.common.collect.Lists;
 
 import edu.jhuapl.saavtk.config.ViewConfig;
-import edu.jhuapl.saavtk.model.ShapeModelType;
 import edu.jhuapl.saavtk.model.ShapeModelBody;
+import edu.jhuapl.saavtk.model.ShapeModelType;
 import edu.jhuapl.sbmt.client.SmallBodyViewConfig;
 import edu.jhuapl.sbmt.model.image.ImageSource;
 import edu.jhuapl.sbmt.model.image.ImagingInstrument;
@@ -163,8 +163,9 @@ public class WebsiteImageListMaker
                                     source.name());
 
                             GenericPhpQuery genericQuery = (GenericPhpQuery) instrument.searchQuery;
+
                             String imagesDatabase = genericQuery
-                                    .getTablePrefix() + "images_"
+                                    .getTablePrefix(source) + "images_"
                                     + source.getDatabaseTableName();
                             List<List<Object>> columnNamesResult = db.query(
                                     "SHOW COLUMNS FROM " + imagesDatabase);
