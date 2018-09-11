@@ -22,10 +22,18 @@ import edu.jhuapl.saavtk.util.Configuration;
 
 public class MapMakerRemote
 {
+
     private ProcessBuilder processBuilder;
+    private String name;
     private String gravityExecutableName;
     private PolyhedralModel smallBodyModel;
     private String dgCacheDir = "/Users/steelrj1/git/sbmt/misc/programs";
+    private double latitude;
+    private double longitude;
+    private int halfSize = 512;
+    private double pixelSize;
+    private File outputFolder;
+    private File mapletFitsFile;
 
     public static void main(String[] args) throws IOException
     {
@@ -193,6 +201,83 @@ public class MapMakerRemote
     {
         this.smallBodyModel = smallBodyModel;
     }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    public double getLatitude()
+    {
+        return latitude;
+    }
+
+    /**
+     * set the latitude in degrees
+     * @param latitude
+     */
+    public void setLatitude(double latitude)
+    {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude()
+    {
+        return longitude;
+    }
+
+    /**
+     * set the longitude in degrees and as West Longitude (not east as is shown in the status bar)
+     * @param longitude
+     */
+    public void setLongitude(double longitude)
+    {
+        this.longitude = longitude;
+        this.longitude = 360.0 - this.longitude;
+        if (this.longitude < 0.0)
+            this.longitude += 360.0;
+    }
+
+    public int getHalfSize()
+    {
+        return halfSize;
+    }
+
+    public void setHalfSize(int halfSize)
+    {
+        this.halfSize = halfSize;
+    }
+
+    public double getPixelSize()
+    {
+        return pixelSize;
+    }
+
+    public void setPixelSize(double pixelSize)
+    {
+        this.pixelSize = pixelSize;
+    }
+
+    public File getMapletFile()
+    {
+        return mapletFitsFile;
+    }
+
+    public File getOutputFolder()
+    {
+        return outputFolder;
+    }
+
+    public void setOutputFolder(File outputFolder)
+    {
+        this.outputFolder = outputFolder;
+    }
+
 
 }
 
