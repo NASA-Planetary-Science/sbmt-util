@@ -11,8 +11,8 @@ import edu.jhuapl.sbmt.model.eros.NIS;
 public class NisSample
 {
     final static NIS nis=new NIS();
-    public static int spectrumLength=nis.getBandCenters().length;
-    public static int timeStringLength=23;
+    public static int spectrumLength = NIS.bandCentersLength;
+    public static int timeStringLength = 23;
 
     int faceId;
     NisTime time;
