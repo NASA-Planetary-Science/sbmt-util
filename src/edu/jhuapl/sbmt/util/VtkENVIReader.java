@@ -46,7 +46,6 @@ public class VtkENVIReader extends vtkImageReader2
         // Read the header if we have not done so already
         if(headerMap == null)
         {
-        	System.out.println("VtkENVIReader: Update: reading header");
             headerMap = readEnviHeader();
         }
 
@@ -71,7 +70,6 @@ public class VtkENVIReader extends vtkImageReader2
         // Read the header if we have not done so already
         if(headerMap == null)
         {
-        	System.out.println("VtkENVIReader: getNumBands: reading header");
             headerMap = readEnviHeader();
         }
 
