@@ -114,7 +114,7 @@ public class VtkENVIReader extends vtkImageReader2
         catch(Exception e)
         {
             // Print out error message
-            System.err.println("Error reading ENVI header: " + e.getMessage());
+            System.err.println("VtkENVIReader: Error reading ENVI header: " + e.getMessage());
         }
 
         // If we reached this point then something went wrong, return null
