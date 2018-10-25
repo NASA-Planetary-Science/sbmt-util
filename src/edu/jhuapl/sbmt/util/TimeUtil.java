@@ -2,11 +2,11 @@ package edu.jhuapl.sbmt.util;
 
 import java.io.File;
 
-import spice.basic.CSPICE;
-import spice.basic.SpiceErrorException;
-
 import edu.jhuapl.saavtk.util.Configuration;
 import edu.jhuapl.saavtk.util.ConvertResourceToFile;
+
+import spice.basic.CSPICE;
+import spice.basic.SpiceErrorException;
 
 /**
  * Contains static utility functions for converting from UTC and ephemeris time
@@ -43,7 +43,7 @@ public class TimeUtil
     {
         try
         {
-            return CSPICE.str2et(str);
+            return CSPICE.str2et(str.substring(0, 23));
         }
         catch (SpiceErrorException e)
         {
