@@ -14,7 +14,13 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+
+import javax.swing.JOptionPane;
+
+import altwg.tools.DistributedGravity;
 
 
 public class MapMakerRemote
@@ -71,6 +77,18 @@ public class MapMakerRemote
     {
         System.out.println("MapMakerRemote: runMapmaker: running mapmaker");
 
+        Object[] options = {"Just run Mapmaker",
+                "Run Distributed Gravity"};
+        int n = JOptionPane.showOptionDialog(null,
+        "This will run mapmaker remotely and return a FITS file; do you want to also run Distributed Gravity locally?",
+        "Run Distributed Gravity?",
+        JOptionPane.YES_NO_CANCEL_OPTION,
+        JOptionPane.QUESTION_MESSAGE,
+        null,
+        options,
+        options[0]);
+
+
         HashMap<String, String> args = new HashMap<>();
         args.put("mapfilename", name);
         args.put("halfsize", String.valueOf(halfSize));
@@ -83,6 +101,69 @@ public class MapMakerRemote
         String arguments = constructUrlArguments(args);
         System.out.println("MapMakerRemote: runMapmaker: doing query");
         doQuery("http://sbmt.jhuapl.edu/admin/joshtest/index01.php", arguments);
+
+        System.out.println("MapMakerRemote: runMapmaker: returned from running query");
+        if (n == 1)
+        {
+            System.out.println("MapMakerRemote: runMapmaker: running Distributed Gravity");
+            // Assemble options for calling DistributedGravity
+            File tempFolder = new File("/Users/steelrj1/Desktop/");
+            File objShapeFile = new File("/Users/steelrj1/Desktop/shape0.obj");
+            File mapmakerToFitsFile = new File(outputFolder + File.separator + name + ".fits");
+            File dgFitsFile = new File(outputFolder + File.separator + name + "_FINAL.FIT");
+            List<String> dgOptionList = new LinkedList<String>();
+            dgOptionList.add("-d");
+            dgOptionList.add("2.67");   //density
+            dgOptionList.add("-r");
+            dgOptionList.add("0.000331165761670640");   //rotation rate
+            dgOptionList.add("--werner");
+            dgOptionList.add("--centers");
+            dgOptionList.add("--batch-type");
+            dgOptionList.add("local");
+            dgOptionList.add("--fits-local");
+            dgOptionList.add(mapmakerToFitsFile.getPath());
+            dgOptionList.add("--ref-potential");
+            dgOptionList.add("-53.765039959572114");    //reference potential
+            dgOptionList.add("--output-folder");
+            dgOptionList.add("/Users/steelrj1/Desktop");
+            dgOptionList.add(objShapeFile.getPath()); // Global shape model file, Olivier suggests lowest res .OBJ **/
+            dgOptionList.add(dgFitsFile.getPath()); // Path to output file that will contain all results
+            dgOptionList.add("/Users/steelrj1/Desktop");
+            dgOptionList.add(gravityExecutableName); // Version of gravity called differs by OS
+
+
+            // Debug output
+//            System.out.println("Calling Distributed Gravity with...");
+//            System.out.println("  density = " + smallBodyModel.getDensity() + " g/cm^3");
+//            System.out.println("  rotation rate = " + smallBodyModel.getRotationRate() + " rad/s");
+//            System.out.println("  reference potential = " + smallBodyModel.getReferencePotential() + " J/kg");
+
+            // Convert argument list to array and call DistributedGravity
+            // Resulting FITS file has original Maplet2FITS planes plus the following:
+            // Add gravity information by appending the following planes to the FITs file
+            // 10. normal vector x component
+            // 11. normal vector y component
+            // 12. normal vector z component
+            // 13. gravacc x component
+            // 14. gravacc y component
+            // 15. gravacc z component
+            // 16. magnitude of grav acc
+            // 17. grav potential
+            // 18. elevation
+            // 19. slope
+            // 20. Tilt
+            // 21. Tilt direction
+            // 22. Tilt mean
+            // 23. Tilt standard deviation
+            // 24. Distance to plane
+            // 25. Shaded relief
+            String[] dgOptionArray = dgOptionList.toArray(new String[dgOptionList.size()]);
+            for (String option : dgOptionArray)
+            {
+                System.out.println("MapMakerRemote: runMapmaker: option " + option);
+            }
+            DistributedGravity.main(dgOptionArray);
+        }
 
 //        String userpass = "sbmtAdmin:$mallBodies18!";
 //        String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userpass.getBytes()));
