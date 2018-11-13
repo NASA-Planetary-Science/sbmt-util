@@ -20,8 +20,6 @@ import java.util.Map;
 
 import javax.swing.JOptionPane;
 
-import altwg.tools.DistributedGravity;
-
 
 public class MapMakerRemote
 {
@@ -162,7 +160,7 @@ public class MapMakerRemote
             {
                 System.out.println("MapMakerRemote: runMapmaker: option " + option);
             }
-            DistributedGravity.main(dgOptionArray);
+            SBMTDistributedGravity.main(dgOptionArray);
         }
 
 //        String userpass = "sbmtAdmin:$mallBodies18!";
