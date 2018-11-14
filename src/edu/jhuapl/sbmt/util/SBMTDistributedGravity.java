@@ -2,13 +2,22 @@ package edu.jhuapl.sbmt.util;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.security.CodeSource;
+import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -16,6 +25,9 @@ import java.util.Map;
 import java.util.StringJoiner;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.math3.geometry.euclidean.threed.Rotation;
@@ -64,6 +76,7 @@ import altwg.util.TiltUtil;
 import nom.tam.fits.FitsException;
 import nom.tam.fits.HeaderCard;
 import nom.tam.fits.HeaderCardException;
+import nom.tam.fits.utilities.Main;
 import spice.basic.Matrix33;
 import spice.basic.Vector3;
 
@@ -81,6 +94,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 
 	// used for shortDescription() and fullDescription()
 	private final static SBMTDistributedGravity defaultObj = new SBMTDistributedGravity();
+
 
 	 @Override
 	    public String shortDescription() {
@@ -696,7 +710,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	            // } else {
 	            // howToEvaluateSwitch = "--file " + fieldpointsfile;
 	            // }
-	            howToEvaluateSwitch = "file " + fieldpointsfile;
+	            howToEvaluateSwitch = "file " + "\"" + fieldpointsfile + "\"";
 	            size = FileUtil.getNumberOfLinesInfile(fieldpointsfile);
 	            System.out.println("preparing to evaluate gravity for " + String.valueOf(size) + " records"
 	                    + " in fits file");
@@ -739,6 +753,26 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        }
 
 	        // create the list of commands which we will submit to the batch queuing system
+	        URI gravityExe;
+	        try
+            {
+                gravityExe = getFile(getJarURI(), "misc/programs/gravity/macos/gravity");
+                System.out.println(
+                        "SBMTDistributedGravity: getGravityAtLocations: gravityExe " + gravityExe);
+            }
+            catch (URISyntaxException | FileNotFoundException e)
+            {
+                String path = new File("").getAbsolutePath();
+                System.out.println(
+                        "SBMTDistributedGravity: getGravityAtLocations: path is " + path);
+                gravityExe = getFile(URI.create("file://" + path), "/misc/programs/gravity/macos/gravity");
+                // TODO Auto-generated catch block
+//                e.printStackTrace();
+            }
+	        System.out.println(
+                    "SBMTDistributedGravity: getGravityAtLocations: gravityExe " + gravityExe);
+	        System.out.println(
+                    "SBMTDistributedGravity: getGravityAtLocations: output folder " + outputFolder);
 	        for (int i = 0; i < coresToUse; i++) {
 	            final long startId = i * chunk;
 	            final long stopId = i < coresToUse - 1 ? (i + 1) * chunk : size;
@@ -752,12 +786,13 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	                                stopId, outfilename, i, outputFolder, gravConstant, objfile, externalBody);
 	            } else {
 	                command = String.format(
-	                        "gravity -d %.16e -r %.16e --%s --%s --start-index %d --end-index %d --suffix %s%d "
-	                                + "--output-folder %s --gravConst %.16e %s", rootDir + File.separator + gravityExecutableName,
+	                        "export DYLD_FALLBACK_LIBRARY_PATH=" + new File(gravityExe.getPath()).getParent() + ";" + gravityExe.getPath() + " -d %.16e -r %.16e --%s --%s --start-index %d --end-index %d --suffix %s%d "
+	                                + "--output-folder \"%s\" --gravConst %.16e %s", //rootDir + File.separator + gravityExecutableName,
 	                        density, rotationRate, gravityType.name().toLowerCase(), howToEvaluateSwitch, startId,
-	                        stopId, outfilename, i, outputFolder, gravConstant, objfile);
+	                        stopId, outfilename,  i, outputFolder, gravConstant, objfile);
 	            }
-
+	            System.out.println(
+                        "SBMTDistributedGravity: getGravityAtLocations: command is " + command);
 	            commandList.add(command);
 	        }
 
@@ -984,6 +1019,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        if (arg.cheng) {
 	            gravityType = GravityAlgorithmType.CHENG;
 	        }
+	        System.out.println("SBMTDistributedGravity: main: arg local fits" + arg.localFitsFname);
 	        if (arg.localFitsFname.length() > 0) {
 	            howToEvalute = HowToEvaluate.EVALUATE_AT_POINTS_IN_FITS_FILE;
 	            inputfitsfile = arg.localFitsFname;
@@ -1154,7 +1190,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	                System.out.println("Error: " + inputfitsfile + " does not exist.");
 	                System.exit(1);
 	            }
-
+	            System.out.println("SBMTDistributedGravity: main: running gravity for local fits");
 	            gravityForLocalFits(inputfitsfile, arg.configFile, gravConst, gridType, keepGfiles, altwgName);
 
 	        }
@@ -1254,6 +1290,8 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        double[][][] regriddedGravity = regridToLocalFitsPoints(inputfitsfile, indata, nX, nY,
 	                fitspolydata, gravAtLocations);
 
+	        System.out.println(
+                    "SBMTDistributedGravity: gravityForLocalFits: done with regridding");
 	        // load fits header from input fits file to get rotation and translation information, as
 	        // well as gsd scaling.
 	        Map<String, HeaderCard> headerMap = FitsUtil.getFitsHeaderAsMap(inputfitsfile);
@@ -1276,6 +1314,8 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	            gsd = gsd / scalFactor;
 	        }
 
+	        System.out.println(
+                    "SBMTDistributedGravity: gravityForLocalFits: generating sun and eye vectors");
 	        // need to generate sun and eye vectors for calculating shaded relief
 	        double[] pointOnPlane = new double[3];
 	        Rotation rot = PolyDataUtil2.fitPlaneToPolyData(fitspolydata, pointOnPlane);
@@ -1370,7 +1410,8 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        }
 	        // assume that evaluating to points in fits file means output is not global
 	        boolean isGlobal = false;
-
+	        System.out.println(
+                    "SBMTDistributedGravity: gravityForLocalFits: saving to fits");
 	        saveToFits(isGlobal, configFile, altwgName, outData, inputfitsfile, outfile);
 
 	    }
@@ -1417,6 +1458,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	                String errMesg = "ERROR! No PlaneInfo associated with AltwgProducType:" + anciFitsType.toString();
 	                throw new RuntimeException(errMesg);
 	            }
+	            System.out.println("SBMTDistributedGravity: saveToFits: adding plane " + thisPlane);
 	            planeList.add(thisPlane);
 	        }
 //	      planeList.add(PlaneInfo.NORM_VECTOR_X);
@@ -1441,7 +1483,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        System.out.println("total number of planes, after adding gravity:" + planeList.size());
 
 	        // AltwgProductType altwgProduct = AltwgProductType.DTM;
-	        System.out.println(StringUtil.timenow() + ":saving local fits");
+	        System.out.println(StringUtil.timenow() + ":saving local fits to " + outfile);
 
 	        // assume evaluation at points in fits file only happens for local fits
 	        FitsHeaderType hdrType = FitsHeaderType.DTMLOCALALTWG;
@@ -1743,6 +1785,115 @@ public class SBMTDistributedGravity implements ALTWGTool {
 
 	        return hdrBuilder;
 	    }
+
+
+	    private static URI getJarURI()
+	            throws URISyntaxException
+	        {
+	            final ProtectionDomain domain;
+	            final CodeSource       source;
+	            final URL              url;
+	            final URI              uri;
+
+	            domain = Main.class.getProtectionDomain();
+	            source = domain.getCodeSource();
+	            url    = source.getLocation();
+	            uri    = url.toURI();
+	            return (uri);
+	        }
+
+	        private static URI getFile(final URI    where,
+	                                   final String fileName)
+	            throws ZipException,
+	                   IOException
+	        {
+	            final File location;
+	            final URI  fileURI;
+
+	            location = new File(where);
+
+	            // not in a JAR, just return the path on disk
+	            if(location.isDirectory())
+	            {
+	                fileURI = URI.create(where.toString() + fileName);
+	            }
+	            else
+	            {
+	                final ZipFile zipFile;
+
+	                zipFile = new ZipFile(location);
+
+	                try
+	                {
+	                    fileURI = extract(zipFile, fileName);
+	                }
+	                finally
+	                {
+	                    zipFile.close();
+	                }
+	            }
+
+	            return (fileURI);
+	        }
+
+	        private static URI extract(final ZipFile zipFile,
+	                                   final String  fileName)
+	            throws IOException
+	        {
+	            final File         tempFile;
+	            final ZipEntry     entry;
+	            final InputStream  zipStream;
+	            OutputStream       fileStream;
+
+	            tempFile = File.createTempFile(fileName, Long.toString(System.currentTimeMillis()));
+	            tempFile.deleteOnExit();
+	            entry    = zipFile.getEntry(fileName);
+
+	            if(entry == null)
+	            {
+	                throw new FileNotFoundException("cannot find file: " + fileName + " in archive: " + zipFile.getName());
+	            }
+
+	            zipStream  = zipFile.getInputStream(entry);
+	            fileStream = null;
+
+	            try
+	            {
+	                final byte[] buf;
+	                int          i;
+
+	                fileStream = new FileOutputStream(tempFile);
+	                buf        = new byte[1024];
+	                i          = 0;
+
+	                while((i = zipStream.read(buf)) != -1)
+	                {
+	                    fileStream.write(buf, 0, i);
+	                }
+	            }
+	            finally
+	            {
+	                close(zipStream);
+	                close(fileStream);
+	            }
+
+	            return (tempFile.toURI());
+	        }
+
+	        private static void close(final Closeable stream)
+	        {
+	            if(stream != null)
+	            {
+	                try
+	                {
+	                    stream.close();
+	                }
+	                catch(final IOException ex)
+	                {
+	                    ex.printStackTrace();
+	                }
+	            }
+	        }
 
 
 }

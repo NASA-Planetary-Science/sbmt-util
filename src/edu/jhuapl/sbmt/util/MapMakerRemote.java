@@ -33,6 +33,7 @@ public class MapMakerRemote
     private File mapletFitsFile;
     private String datadir;
     private String cacheDir;
+    private String lowResModelPath;
 
     public void setDatadir(String datadir)
     {
@@ -97,7 +98,7 @@ public class MapMakerRemote
         args.put("mapoutdir", mapoutdir);
 
         String arguments = constructUrlArguments(args);
-        System.out.println("MapMakerRemote: runMapmaker: doing query");
+        System.out.println("MapMakerRemote: runMapmaker: doing query; outputdirectory " + outputFolder);
         doQuery("http://sbmt.jhuapl.edu/admin/joshtest/index01.php", arguments);
 
         System.out.println("MapMakerRemote: runMapmaker: returned from running query");
@@ -105,8 +106,8 @@ public class MapMakerRemote
         {
             System.out.println("MapMakerRemote: runMapmaker: running Distributed Gravity");
             // Assemble options for calling DistributedGravity
-            File tempFolder = new File("/Users/steelrj1/Desktop/");
-            File objShapeFile = new File("/Users/steelrj1/Desktop/shape0.obj");
+//            File tempFolder = new File("/Users/steelrj1/Desktop/");
+//            File objShapeFile = new File("/Users/steelrj1/Desktop/shape0.obj");
             File mapmakerToFitsFile = new File(outputFolder + File.separator + name + ".fits");
             File dgFitsFile = new File(outputFolder + File.separator + name + "_FINAL.FIT");
             List<String> dgOptionList = new LinkedList<String>();
@@ -123,11 +124,12 @@ public class MapMakerRemote
             dgOptionList.add("--ref-potential");
             dgOptionList.add("-53.765039959572114");    //reference potential
             dgOptionList.add("--output-folder");
-            dgOptionList.add("/Users/steelrj1/Desktop");
-            dgOptionList.add(objShapeFile.getPath()); // Global shape model file, Olivier suggests lowest res .OBJ **/
+            dgOptionList.add(cacheDir);
+            dgOptionList.add("/Users/steelrj1/.sbmt/cache/2/EROS/shape0.obj");
+//            dgOptionList.add(lowResModelPath); // Global shape model file, Olivier suggests lowest res .OBJ **/
             dgOptionList.add(dgFitsFile.getPath()); // Path to output file that will contain all results
-            dgOptionList.add("/Users/steelrj1/Desktop");
-            dgOptionList.add(gravityExecutableName); // Version of gravity called differs by OS
+//            dgOptionList.add("/Users/steelrj1/Desktop");
+//            dgOptionList.add(gravityExecutableName); // Version of gravity called differs by OS
 
 
             // Debug output
@@ -384,6 +386,12 @@ public class MapMakerRemote
     public void setCacheDir(String cacheDir)
     {
         this.cacheDir = cacheDir;
+        this.outputFolder = new File(cacheDir);
+    }
+
+    public void setLowResModelPath(String path)
+    {
+        this.lowResModelPath = path;
     }
 
     protected OutputStream doQuery(String phpScript, String data) throws IOException
