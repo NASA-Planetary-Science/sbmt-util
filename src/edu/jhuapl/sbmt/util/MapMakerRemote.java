@@ -34,6 +34,10 @@ public class MapMakerRemote
     private String datadir;
     private String cacheDir;
     private String lowResModelPath;
+    private double density;
+    private double rotationRate;
+    private double referencePotential;
+    private String bodyLowestResModelName;
 
     public void setDatadir(String datadir)
     {
@@ -104,7 +108,7 @@ public class MapMakerRemote
         System.out.println("MapMakerRemote: runMapmaker: returned from running query");
         if (n == 1)
         {
-            System.out.println("MapMakerRemote: runMapmaker: running Distributed Gravity");
+            System.out.println("MapMakerRemote: runMapmaker: running Distributed Gravity rotation rate " + rotationRate + " ref pot " + referencePotential + " density " + density);
             // Assemble options for calling DistributedGravity
 //            File tempFolder = new File("/Users/steelrj1/Desktop/");
 //            File objShapeFile = new File("/Users/steelrj1/Desktop/shape0.obj");
@@ -112,9 +116,9 @@ public class MapMakerRemote
             File dgFitsFile = new File(outputFolder + File.separator + name + "_FINAL.FIT");
             List<String> dgOptionList = new LinkedList<String>();
             dgOptionList.add("-d");
-            dgOptionList.add("2.67");   //density
+            dgOptionList.add(""+density);   //density
             dgOptionList.add("-r");
-            dgOptionList.add("0.000331165761670640");   //rotation rate
+            dgOptionList.add("" + rotationRate);   //rotation rate
             dgOptionList.add("--werner");
             dgOptionList.add("--centers");
             dgOptionList.add("--batch-type");
@@ -122,10 +126,10 @@ public class MapMakerRemote
             dgOptionList.add("--fits-local");
             dgOptionList.add(mapmakerToFitsFile.getPath());
             dgOptionList.add("--ref-potential");
-            dgOptionList.add("-53.765039959572114");    //reference potential
+            dgOptionList.add("" + referencePotential);    //reference potential
             dgOptionList.add("--output-folder");
             dgOptionList.add(cacheDir);
-            dgOptionList.add("/Users/steelrj1/.sbmt/cache/2/EROS/shape0.obj");
+            dgOptionList.add("/Users/steelrj1/.sbmt/cache/2/" + bodyLowestResModelName);
 //            dgOptionList.add(lowResModelPath); // Global shape model file, Olivier suggests lowest res .OBJ **/
             dgOptionList.add(dgFitsFile.getPath()); // Path to output file that will contain all results
 //            dgOptionList.add("/Users/steelrj1/Desktop");
@@ -471,6 +475,26 @@ public class MapMakerRemote
         }
 
         return str;
+    }
+
+    public void setDensity(double density)
+    {
+        this.density = density;
+    }
+
+    public void setRotationRate(double rotationRate)
+    {
+        this.rotationRate = rotationRate;
+    }
+
+    public void setReferencePotential(double referencePotential)
+    {
+        this.referencePotential = referencePotential;
+    }
+
+    public void setBodyLowestResModelName(String bodyLowestResModelName)
+    {
+        this.bodyLowestResModelName = bodyLowestResModelName;
     }
 
 
