@@ -113,7 +113,7 @@ public class MapMakerRemote
 //            File tempFolder = new File("/Users/steelrj1/Desktop/");
 //            File objShapeFile = new File("/Users/steelrj1/Desktop/shape0.obj");
             File mapmakerToFitsFile = new File(outputFolder + File.separator + name + ".fits");
-            File dgFitsFile = new File(outputFolder + File.separator + name + "_FINAL.FIT");
+            File dgFitsFile = new File(outputFolder + File.separator + name + "_FINAL.fits");
             List<String> dgOptionList = new LinkedList<String>();
             dgOptionList.add("-d");
             dgOptionList.add(""+density);   //density

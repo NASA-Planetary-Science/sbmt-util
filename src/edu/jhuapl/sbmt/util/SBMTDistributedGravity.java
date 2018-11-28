@@ -65,7 +65,6 @@ import altwg.util.FitsData.FitsDataBuilder;
 import altwg.util.FitsHdr;
 import altwg.util.FitsHdr.FitsHdrBuilder;
 import altwg.util.FitsUtil;
-import altwg.util.GMTGridUtil;
 import altwg.util.GridType;
 import altwg.util.JCommanderUsage;
 import altwg.util.MathUtil;
@@ -1538,7 +1537,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        double[][] rotation = r.toArray();
 
 	        // create GMTGridUtil to regrid the data
-	        GMTGridUtil gmtUtil = new GMTGridUtil(nX, nY, gsd);
+	        SBMTGMTGridUtil gmtUtil = new SBMTGMTGridUtil(nX, nY, gsd);
 
 	        // compile center x,y,z and gravity values into a 2D array
 	        double[][] centerArr = valuesToRegrid(gravAtLocations, fitspolydata);
@@ -1589,7 +1588,8 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	            }
 	            outIndex++;
 	        }
-
+	        System.out.println(
+                    "SBMTDistributedGravity: regridToLocalFitsPoints: returning " + gravRegridded);
 	        return gravRegridded;
 	    }
 
@@ -1639,7 +1639,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        out.close();
 	    }
 
-	    private static GMTGridUtil setEvalPoints(GMTGridUtil gmt, double[][][] data, int nX, int nY,
+	    private static SBMTGMTGridUtil setEvalPoints(SBMTGMTGridUtil gmt, double[][][] data, int nX, int nY,
 	            List<PlaneInfo> fitsPlanes) {
 	        int xIndex = fitsPlanes.indexOf(PlaneInfo.X);
 	        int yIndex = fitsPlanes.indexOf(PlaneInfo.Y);
