@@ -43,7 +43,10 @@ public class TimeUtil
     {
         try
         {
-            return CSPICE.str2et(str.substring(0, 23));
+            if (str.length() > 23)
+                return CSPICE.str2et(str.substring(0, 23));
+            else
+                return CSPICE.str2et(str);
         }
         catch (SpiceErrorException e)
         {
