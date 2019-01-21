@@ -20,6 +20,7 @@ import com.google.common.collect.Sets;
 import edu.jhuapl.saavtk.model.ShapeModelType;
 import edu.jhuapl.saavtk.model.ShapeModelBody;
 import edu.jhuapl.saavtk.util.NativeLibraryLoader;
+import edu.jhuapl.sbmt.client.ISmallBodyModel;
 import edu.jhuapl.sbmt.client.SbmtModelFactory;
 import edu.jhuapl.sbmt.client.SmallBodyModel;
 import edu.jhuapl.sbmt.client.SmallBodyViewConfig;
@@ -75,7 +76,7 @@ public class NisDataSource
         return erosModel.getModelResolution();
     }
 
-    public SmallBodyModel getSmallBodyModel()
+    public ISmallBodyModel getSmallBodyModel()
     {
         return erosModel;
     }
