@@ -13,6 +13,8 @@ import java.util.HashMap;
 import vtk.vtkImageData;
 import vtk.vtkImageReader2;
 
+import edu.jhuapl.saavtk.util.ImageDataUtil;
+
 // This class was written to be used like vtkPNGReader but
 // only for converting ENVI format files to vtkImageData
 // Note: ENVI format image = binary + .hdr file
@@ -129,7 +131,7 @@ public class VtkENVIReader extends vtkImageReader2
             int lines = Integer.valueOf(headerMap.get("lines"));
             int bands = Integer.valueOf(headerMap.get("bands"));
             int headerOffset = Integer.valueOf(headerMap.get("header offset"));
-            String interleave = headerMap.get("interleave");
+            String interleave = headerMap.get("interleave").toLowerCase();
             int byteOrder = Integer.valueOf(headerMap.get("byte order"));
 
             // Check if interleave type is recognized

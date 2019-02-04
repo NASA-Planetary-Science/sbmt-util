@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import nom.tam.fits.HeaderCard;
+import edu.jhuapl.sbmt.model.image.ImageKeyInterface;
 
-import edu.jhuapl.sbmt.model.image.Image.ImageKey;
+import nom.tam.fits.HeaderCard;
 
 /**
  * Container class for storing the metadata that we'd like to put into the Backplanes PDS4 XML
@@ -52,7 +52,7 @@ public class BackPlanesXmlMeta
     /*
      * These fields are common to all XML labels
      */
-    public final ImageKey imageKey;
+    public final ImageKeyInterface imageKey;
 
     public final Map<MetaField, String> metaStrings;
 //    public final String logicalId;
@@ -111,7 +111,7 @@ public class BackPlanesXmlMeta
      *
      */
     public static class BPMetaBuilder {
-        private ImageKey imageKey = null;
+        private ImageKeyInterface imageKey = null;
 //        private String logicalId = "";
 //        private String startDateTime = "";
 //        private String stopDateTime = "";
@@ -149,7 +149,7 @@ public class BackPlanesXmlMeta
          * @return
          */
 
-        public BPMetaBuilder setKey(ImageKey key) {
+        public BPMetaBuilder setKey(ImageKeyInterface key) {
             this.imageKey = key;
             return this;
         }

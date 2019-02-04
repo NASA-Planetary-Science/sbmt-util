@@ -10,17 +10,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import edu.jhuapl.saavtk.util.Configuration;
+import edu.jhuapl.saavtk.util.FileUtil;
+
 import nom.tam.fits.BasicHDU;
 import nom.tam.fits.Fits;
 import nom.tam.fits.FitsException;
 import nom.tam.fits.FitsFactory;
 import nom.tam.util.BufferedFile;
 
-import edu.jhuapl.saavtk.util.Configuration;
-import edu.jhuapl.saavtk.util.FileUtil;
 
-
-public class Mapmaker
+public class MapmakerNativeWrapper implements Runnable
 {
     public static final int MAX_WIDTH = 1027;
     public static final int MAX_HEIGHT = 1027;
@@ -36,7 +36,7 @@ public class Mapmaker
     private File outputFolder;
     private File mapletFitsFile;
 
-    public Mapmaker(String mapmakerRootDir) throws IOException
+    public MapmakerNativeWrapper(String mapmakerRootDir) throws IOException
     {
         this.mapmakerRootDir = mapmakerRootDir;
 
@@ -75,6 +75,7 @@ public class Mapmaker
         new File(processName).setExecutable(true);
         processCommand.add(processName);
     }
+
 
     public Process runMapmaker() throws IOException, InterruptedException
     {
@@ -241,6 +242,22 @@ public class Mapmaker
     public void setOutputFolder(File outputFolder)
     {
         this.outputFolder = outputFolder;
+    }
+
+
+    @Override
+    public void run()
+    {
+        try
+        {
+            runMapmaker();
+        }
+        catch (IOException | InterruptedException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
     }
 
 }
