@@ -166,7 +166,7 @@ public class MapMakerRemote
             {
                 System.out.println("MapMakerRemote: runMapmaker: option " + option);
             }
-            SBMTDistributedGravity.main(dgOptionArray);
+//            SBMTDistributedGravity.main(dgOptionArray);
         }
 
 //        String userpass = "sbmtAdmin:$mallBodies18!";
