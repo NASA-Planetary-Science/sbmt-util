@@ -20,6 +20,8 @@ import java.util.Map;
 
 import javax.swing.JOptionPane;
 
+import org.apache.commons.lang3.SystemUtils;
+
 
 public class MapMakerRemote
 {
@@ -80,16 +82,34 @@ public class MapMakerRemote
     {
         System.out.println("MapMakerRemote: runMapmaker: running mapmaker");
 
-        Object[] options = {"Just run Mapmaker",
-                "Run Distributed Gravity"};
-        int n = JOptionPane.showOptionDialog(null,
-        "This will run mapmaker remotely and return a FITS file; do you want to also run Distributed Gravity locally?",
-        "Run Distributed Gravity?",
-        JOptionPane.YES_NO_CANCEL_OPTION,
-        JOptionPane.QUESTION_MESSAGE,
-        null,
-        options,
-        options[0]);
+        int n = 0;
+        if (SystemUtils.IS_OS_MAC_OSX)
+    	{
+	        Object[] options = {"Just run Mapmaker",
+	                "Run Distributed Gravity"};
+	        n = JOptionPane.showOptionDialog(null,
+	        "This will run mapmaker remotely and return a FITS file; do you want to also run Distributed Gravity locally?",
+	        "Run Distributed Gravity?",
+	        JOptionPane.YES_NO_CANCEL_OPTION,
+	        JOptionPane.QUESTION_MESSAGE,
+	        null,
+	        options,
+	        options[0]);
+    	}
+        else if (SystemUtils.IS_OS_LINUX)
+    	{
+    		JOptionPane.showMessageDialog(null,
+    				"Please note: only basic FITS file generation is available on this platform at the current time.  Backplanes generated from the gravity executable are not available at this time in SBMT "
+    				+ "for Linux systems",
+    				"Limited Features", JOptionPane.WARNING_MESSAGE);
+    	}
+        else if (SystemUtils.IS_OS_WINDOWS)
+        {
+        	JOptionPane.showMessageDialog(null,
+    				"Please note: only basic FITS file generation is available on this platform at the current time.  Backplanes generated from the gravity executable are not available on Windows; "
+    				+ "you will have to generate these backplanes manually",
+    				"Limited Features", JOptionPane.WARNING_MESSAGE);
+        }
 
 
         HashMap<String, String> args = new HashMap<>();
@@ -166,7 +186,7 @@ public class MapMakerRemote
             {
                 System.out.println("MapMakerRemote: runMapmaker: option " + option);
             }
-//            SBMTDistributedGravity.main(dgOptionArray);
+            SBMTDistributedGravity.main(dgOptionArray);
         }
 
 //        String userpass = "sbmtAdmin:$mallBodies18!";
