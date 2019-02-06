@@ -1,5 +1,7 @@
 package edu.jhuapl.sbmt.util;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.Closeable;
@@ -29,6 +31,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
+import javax.swing.ProgressMonitor;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.math3.geometry.euclidean.threed.Rotation;
 
@@ -55,8 +59,6 @@ import altwg.tools.ALTWGTool;
 import altwg.tools.ToolsVersion;
 import altwg.util.AltwgDataType;
 import altwg.util.AltwgFits;
-import altwg.util.BatchSubmitFactory;
-import altwg.util.BatchSubmitI;
 import altwg.util.BatchType;
 import altwg.util.CellInfo;
 import altwg.util.FileUtil;
@@ -90,6 +92,10 @@ public class SBMTDistributedGravity implements ALTWGTool {
 
 	 private static String rootDir;
 	 private static String gravityExecutableName;
+	 private static GravityTask task;
+	 private static ProgressMonitor gravityLoadingProgressMonitor;
+	 static ArrayList<GravityValues> results = new ArrayList<GravityValues>();
+
 
 	// used for shortDescription() and fullDescription()
 	private final static SBMTDistributedGravity defaultObj = new SBMTDistributedGravity();
@@ -802,7 +808,8 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        }
 
 	        // Submit the batches and wait till they're finished
-	        BatchSubmitI batchSubmit = BatchSubmitFactory.getBatchSubmit(commandList, batchType, gridType);
+//	        BatchSubmitI batchSubmit = BatchSubmitFactory.getBatchSubmit(commandList, batchType, gridType);
+	        SubmitLocalJob batchSubmit = new SubmitLocalJob(commandList, batchType);
 
 	        // for LOCAL_PARALLEL_MAKE allow one to specify fewer cores than actually exist.
 	        // batchSubmit initializes with the actual number of cores on the machine, so
@@ -824,34 +831,108 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        if (gridType.equals(GridType.LOCAL)) {
 	            batchDir = null;
 	        }
-	        batchSubmit.runBatchSubmitinDir(batchDir);
+//	        batchSubmit.runBatchSubmitinDir(batchDir);
 
-	        // Now read in all results
-	        System.out.println("Reading in the results");
-	        ArrayList<GravityValues> results = new ArrayList<GravityValues>();
-	        for (int i = 0; i < coresToUse; i++) {
-	            String basename = new File(objfile).getName();
-	            File accFile = new File(outputFolder + File.separator + basename + "-acceleration.txt" + outfilename + i);
-	            File potFile = new File(outputFolder + File.separator + basename + "-potential.txt" + outfilename + i);
-	            results.addAll(readGravityResults(accFile, potFile));
+	        gravityLoadingProgressMonitor = new ProgressMonitor(null, "Generating gravity values", "", 0, 100);
+			gravityLoadingProgressMonitor.setProgress(0);
+			final int cores = coresToUse;
+			task = new GravityTask(batchSubmit, batchDir, coresToUse, keepGfiles, outfilename, gravityLoadingProgressMonitor, new GravityCompletionClosure()
+			{
 
-	            if (!keepGfiles) {
-	                // we don't need these files so delete them
-	                accFile.delete();
-	                potFile.delete();
-	            }
-	        }
+				@Override
+				public void complete()
+				{
+					//Now read in all results
+					try
+					{
+				        System.out.println("Reading in the results");
+//				        ArrayList<GravityValues> results = new ArrayList<GravityValues>();
+				        for (int i = 0; i < cores; i++) {
+				            String basename = new File(objfile).getName();
+				            File accFile = new File(outputFolder + File.separator + basename + "-acceleration.txt" + outfilename + i);
+				            File potFile = new File(outputFolder + File.separator + basename + "-potential.txt" + outfilename + i);
+				            results.addAll(readGravityResults(accFile, potFile));
 
-	        if (howToEvalute != HowToEvaluate.EVALUATE_AT_POINTS_IN_FITS_FILE) {
-	            refPotential = getRefPotential(results, minRefPotential);
-	            System.out.println("Reference Potential = " + refPotential);
-	            // save out reference potential to file so it can be loaded in again
-	            if (saveRefPotential)
-	                FileUtils.writeStringToFile(new File(refPotentialFile), String.valueOf(refPotential));
-	        }
+				            if (!keepGfiles) {
+				                // we don't need these files so delete them
+				                accFile.delete();
+				                potFile.delete();
+				            }
+				        }
 
+				        if (howToEvalute != HowToEvaluate.EVALUATE_AT_POINTS_IN_FITS_FILE) {
+				            refPotential = getRefPotential(results, minRefPotential);
+				            System.out.println("Reference Potential = " + refPotential);
+				            // save out reference potential to file so it can be loaded in again
+				            if (saveRefPotential)
+				                FileUtils.writeStringToFile(new File(refPotentialFile), String.valueOf(refPotential));
+				        }
+					}
+					catch (IOException ioe)
+					{
+						ioe.printStackTrace();
+					}
+
+				}
+			});
+			task.addPropertyChangeListener(new PropertyChangeListener()
+			{
+
+				@Override
+				public void propertyChange(PropertyChangeEvent evt)
+				{
+					if ("progress" == evt.getPropertyName())
+					{
+
+//						int progress = (Integer) evt.getNewValue();
+//						gravityLoadingProgressMonitor.setProgress(progress);
+//						String message =
+//								String.format("Completed %d%%.\n", progress);
+//						gravityLoadingProgressMonitor.setNote(message);
+						if (gravityLoadingProgressMonitor.isCanceled() || task.isDone())
+						{
+							if (gravityLoadingProgressMonitor.isCanceled())
+							{
+								task.cancel(true);
+							}
+							else
+							{
+								//                    taskOutput.append("Task completed.\n");
+							}
+						}
+						//            this.pcs.firePropertyChange(Properties.MODEL_CHANGED, null, null);
+					}
+				}
+			});
+			task.execute();
+
+//	        // Now read in all results
+//	        System.out.println("Reading in the results");
+//	        for (int i = 0; i < coresToUse; i++) {
+//	            String basename = new File(objfile).getName();
+//	            File accFile = new File(outputFolder + File.separator + basename + "-acceleration.txt" + outfilename + i);
+//	            File potFile = new File(outputFolder + File.separator + basename + "-potential.txt" + outfilename + i);
+//	            results.addAll(readGravityResults(accFile, potFile));
+//
+//	            if (!keepGfiles) {
+//	                // we don't need these files so delete them
+//	                accFile.delete();
+//	                potFile.delete();
+//	            }
+//	        }
+//
+//	        if (howToEvalute != HowToEvaluate.EVALUATE_AT_POINTS_IN_FITS_FILE) {
+//	            refPotential = getRefPotential(results, minRefPotential);
+//	            System.out.println("Reference Potential = " + refPotential);
+//	            // save out reference potential to file so it can be loaded in again
+//	            if (saveRefPotential)
+//	                FileUtils.writeStringToFile(new File(refPotentialFile), String.valueOf(refPotential));
+//	        }
+//
 	        return results;
 	    }
+
+
 
 	    // This function reads the reference potential from a file. It is assumed
 	    // the reference potential is the only word in the file.
