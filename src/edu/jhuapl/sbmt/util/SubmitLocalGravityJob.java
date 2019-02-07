@@ -21,7 +21,7 @@ import altwg.util.FileUtil;
  * @author espirrc1
  *
  */
-public class SubmitLocalJob { //implements BatchSubmitI {
+public class SubmitLocalGravityJob { //implements BatchSubmitI {
 
 
 	private ArrayList<String> commandList;
@@ -31,7 +31,7 @@ public class SubmitLocalJob { //implements BatchSubmitI {
 	private String gridQueue = null;
 
 
-	public SubmitLocalJob(ArrayList<String> commandList, BatchType batchType) {
+	public SubmitLocalGravityJob(ArrayList<String> commandList, BatchType batchType) {
 		this.commandList = commandList;
 		this.batchType = batchType;
 		System.out.println("BatchSubmitLocal: BatchSubmitLocal: batch type is " + batchType);
@@ -82,7 +82,7 @@ public class SubmitLocalJob { //implements BatchSubmitI {
 	 * @throws InterruptedException
 	 * @throws IOException
 	 */
-	public boolean runBatchSubmitinDir(String workingDir, ProgressStatusListener listener) throws InterruptedException, IOException {
+	public boolean runBatchSubmitinDir(String workingDir, ProgressStatusListener listener, int maxPoints) throws InterruptedException, IOException {
 
 		System.out.println("BatchSubmitLocal: runBatchSubmitinDir:");
 		//evaluate workingDir. If empty string then set to null;
@@ -97,7 +97,7 @@ public class SubmitLocalJob { //implements BatchSubmitI {
 		case GRID_ENGINE_2:
 				System.out.println("Can't submit grid engine batch type in "
 						+ "BatchSubmitLocal class. Defaulting to use local make");
-				return runBatchSubmitProgramLocalMake(commandList, null);
+				return runBatchSubmitProgramLocalMake(commandList, null, maxPoints);
 
 		case GNU_PARALLEL:
 			return runBatchSubmitProgramParallel(commandList);
@@ -106,13 +106,14 @@ public class SubmitLocalJob { //implements BatchSubmitI {
 			if (workingDir != null) {
 				System.out.println("Cannot run in specified working Dir using " + batchType.toString());
 			}
-			return runBatchSubmitProgramLocalMake(commandList, listener);
+			System.out.println("SubmitLocalGravityJob: runBatchSubmitinDir: max points " + maxPoints);
+			return runBatchSubmitProgramLocalMake(commandList, listener, maxPoints);
 
 		case LOCAL_PARALLEL:
 			if (workingDir != null) {
 				System.out.println("Cannot run in specified working Dir using " + batchType.toString());
 			}
-			return runBatchSubmitProgramLocalMake(commandList, null);
+			return runBatchSubmitProgramLocalMake(commandList, null, maxPoints);
 
 		case LOCAL_SEQUENTIAL:
 			return runBatchSubmitProgramLocalSequential(commandList, workingDir);
@@ -123,12 +124,12 @@ public class SubmitLocalJob { //implements BatchSubmitI {
 		}
 	}
 
-	public boolean runProgramAndWait(String program, ProgressStatusListener listener) throws IOException, InterruptedException {
-		return runProgramAndWait(program, null, listener);
+	public boolean runProgramAndWait(String program, ProgressStatusListener listener, int maxPoints) throws IOException, InterruptedException {
+		return runProgramAndWait(program, null, listener, maxPoints);
 	}
 
 
-	public boolean runProgramAndWait(String program, File workingDirectory, ProgressStatusListener listener) throws IOException,
+	public boolean runProgramAndWait(String program, File workingDirectory, ProgressStatusListener listener, int maxPoints) throws IOException,
 	InterruptedException {
 
 //		return runAndWait(program, workingDirectory, showOutput);
@@ -144,9 +145,29 @@ public class SubmitLocalJob { //implements BatchSubmitI {
 		if (showOutput) {
 			System.out.printf("Output of running %s is:\n", program);
 			while ((line = br.readLine()) != null) {
+				System.out.println(line);
+
 				if (listener != null)
-					listener.setProgressStatus(line);
-				System.out.println("Output from main program:" +  line);
+				{
+					if (line.startsWith("Initialization"))
+					{
+						listener.setProgressStatus("Starting Gravity Generation....", 1);
+					}
+					if (line.startsWith("Time to evaluate total"))
+					{
+						listener.setProgressStatus("Done!", 100);
+						break;
+					}
+					if (line.startsWith("Time"))
+					{
+						int progress = Integer.parseInt(line.split(" ")[4]);
+						int percentage = (int)((float)progress*100.0/(float)maxPoints);
+//						System.out.println("SubmitLocalGravityJob: runProgramAndWait: progress is " + progress + " and max points " + maxPoints);
+//						System.out.println("SubmitLocalGravityJob: runProgramAndWait: setting percentage to " + (int)((float)progress*100.0/(float)maxPoints));
+						listener.setProgressStatus(line, percentage);
+					}
+
+				}
 			}
 		} else {
 			System.out.printf("Output of running %s disabled.\n",program);
@@ -182,7 +203,7 @@ public class SubmitLocalJob { //implements BatchSubmitI {
 		return false;
 	}
 
-	private boolean runBatchSubmitProgramLocalMake(ArrayList<String> commandList, ProgressStatusListener  listener) throws InterruptedException,
+	private boolean runBatchSubmitProgramLocalMake(ArrayList<String> commandList, ProgressStatusListener  listener, int maxPoints) throws InterruptedException,
 	IOException {
 		// Create a Makefile and run the tasks in parallel with the -j option
 		File temp = File.createTempFile("altwg-batch-list", ".tmp", null);
@@ -202,7 +223,7 @@ public class SubmitLocalJob { //implements BatchSubmitI {
 
 		String batchSubmitCommand = "make -k -j " + cores + " -f " + temp.getAbsolutePath() + " all";
 
-		return runProgramAndWait(batchSubmitCommand, listener);
+		return runProgramAndWait(batchSubmitCommand, listener, maxPoints);
 	}
 
 	private boolean runBatchSubmitProgramParallel(ArrayList<String> commandList) throws InterruptedException,
@@ -215,7 +236,7 @@ public class SubmitLocalJob { //implements BatchSubmitI {
 		// Now submit all these batches GNU Parallel
 		String batchSubmitCommand = "parallel -v -a " + temp.getAbsolutePath();
 
-		return runProgramAndWait(batchSubmitCommand, null);
+		return runProgramAndWait(batchSubmitCommand, null, 0);
 	}
 
 	private boolean runBatchSubmitProgramLocalSequential(ArrayList<String> commandList, String workingDir) throws IOException,
@@ -228,10 +249,10 @@ public class SubmitLocalJob { //implements BatchSubmitI {
 		for (String command : commandList) {
 			if (workingDir != null) {
 				File workingFile = new File(workingDir);
-				if (!runProgramAndWait(command, workingFile, null))
+				if (!runProgramAndWait(command, workingFile, null, 0))
 					successful = false;
 			} else {
-				if (!runProgramAndWait(command, null))
+				if (!runProgramAndWait(command, null, 0))
 					successful = false;
 			}
 		}

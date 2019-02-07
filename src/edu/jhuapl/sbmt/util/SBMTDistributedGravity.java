@@ -1,7 +1,5 @@
 package edu.jhuapl.sbmt.util;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.Closeable;
@@ -31,8 +29,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
-import javax.swing.ProgressMonitor;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.math3.geometry.euclidean.threed.Rotation;
 
@@ -51,6 +47,7 @@ import vtk.vtkPolyData;
 import vtk.vtkPolyDataNormals;
 
 import edu.jhuapl.saavtk.util.PolyDataUtil;
+import edu.jhuapl.saavtk.util.ProgressStatusListener;
 
 import altwg.Fits.FitsHeaderType;
 import altwg.Fits.HeaderTag;
@@ -92,8 +89,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 
 	 private static String rootDir;
 	 private static String gravityExecutableName;
-	 private static GravityTask task;
-	 private static ProgressMonitor gravityLoadingProgressMonitor;
+
 	 static ArrayList<GravityValues> results = new ArrayList<GravityValues>();
 
 
@@ -649,7 +645,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	     */
 	    private static List<GravityValues> readGravityResults(File accFile, File potFile) throws IOException {
 
-	    	System.out.println("SBMTDistributedGravity: readGravityResults: ready gravity results");
+	    	System.out.println("SBMTDistributedGravity: readGravityResults: reading gravity results");
 	        ArrayList<double[]> accelerationVector = new ArrayList<double[]>();
 	        ArrayList<Double> potential = new ArrayList<Double>();
 
@@ -697,7 +693,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	     * @throws IOException
 	     */
 	    private static List<GravityValues> getGravityAtLocations(boolean keepGfiles, GridType gridType,
-	            double gravConstant)
+	            double gravConstant, ProgressStatusListener listener)
 	            throws InterruptedException, ExecutionException, IOException {
 
 	        ArrayList<String> commandList = new ArrayList<String>();
@@ -779,9 +775,10 @@ public class SBMTDistributedGravity implements ALTWGTool {
                     "SBMTDistributedGravity: getGravityAtLocations: gravityExe " + gravityExe);
 	        System.out.println(
                     "SBMTDistributedGravity: getGravityAtLocations: output folder " + outputFolder);
+	        long stopId = 0;
 	        for (int i = 0; i < coresToUse; i++) {
 	            final long startId = i * chunk;
-	            final long stopId = i < coresToUse - 1 ? (i + 1) * chunk : size;
+	            stopId = i < coresToUse - 1 ? (i + 1) * chunk : size;
 
 	            String command;
 	            if (useExternalBody) {
@@ -809,7 +806,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 
 	        // Submit the batches and wait till they're finished
 //	        BatchSubmitI batchSubmit = BatchSubmitFactory.getBatchSubmit(commandList, batchType, gridType);
-	        SubmitLocalJob batchSubmit = new SubmitLocalJob(commandList, batchType);
+	        SubmitLocalGravityJob batchSubmit = new SubmitLocalGravityJob(commandList, batchType);
 
 	        // for LOCAL_PARALLEL_MAKE allow one to specify fewer cores than actually exist.
 	        // batchSubmit initializes with the actual number of cores on the machine, so
@@ -831,104 +828,32 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        if (gridType.equals(GridType.LOCAL)) {
 	            batchDir = null;
 	        }
-//	        batchSubmit.runBatchSubmitinDir(batchDir);
+	        System.out.println("SBMTDistributedGravity: getGravityAtLocations: stopid is " + stopId);
+	        batchSubmit.runBatchSubmitinDir(batchDir, listener, (int)stopId);
 
-	        gravityLoadingProgressMonitor = new ProgressMonitor(null, "Generating gravity values", "", 0, 100);
-			gravityLoadingProgressMonitor.setProgress(0);
-			final int cores = coresToUse;
-			task = new GravityTask(batchSubmit, batchDir, coresToUse, keepGfiles, outfilename, gravityLoadingProgressMonitor, new GravityCompletionClosure()
-			{
+	        // Now read in all results
+	        System.out.println("Reading in the results");
+	        for (int i = 0; i < coresToUse; i++) {
+	            String basename = new File(objfile).getName();
+	            File accFile = new File(outputFolder + File.separator + basename + "-acceleration.txt" + outfilename + i);
+	            File potFile = new File(outputFolder + File.separator + basename + "-potential.txt" + outfilename + i);
+	            results.addAll(readGravityResults(accFile, potFile));
 
-				@Override
-				public void complete()
-				{
-					//Now read in all results
-					try
-					{
-				        System.out.println("Reading in the results");
-//				        ArrayList<GravityValues> results = new ArrayList<GravityValues>();
-				        for (int i = 0; i < cores; i++) {
-				            String basename = new File(objfile).getName();
-				            File accFile = new File(outputFolder + File.separator + basename + "-acceleration.txt" + outfilename + i);
-				            File potFile = new File(outputFolder + File.separator + basename + "-potential.txt" + outfilename + i);
-				            results.addAll(readGravityResults(accFile, potFile));
+	            if (!keepGfiles) {
+	                // we don't need these files so delete them
+	                accFile.delete();
+	                potFile.delete();
+	            }
+	        }
 
-				            if (!keepGfiles) {
-				                // we don't need these files so delete them
-				                accFile.delete();
-				                potFile.delete();
-				            }
-				        }
+	        if (howToEvalute != HowToEvaluate.EVALUATE_AT_POINTS_IN_FITS_FILE) {
+	            refPotential = getRefPotential(results, minRefPotential);
+	            System.out.println("Reference Potential = " + refPotential);
+	            // save out reference potential to file so it can be loaded in again
+	            if (saveRefPotential)
+	                FileUtils.writeStringToFile(new File(refPotentialFile), String.valueOf(refPotential));
+	        }
 
-				        if (howToEvalute != HowToEvaluate.EVALUATE_AT_POINTS_IN_FITS_FILE) {
-				            refPotential = getRefPotential(results, minRefPotential);
-				            System.out.println("Reference Potential = " + refPotential);
-				            // save out reference potential to file so it can be loaded in again
-				            if (saveRefPotential)
-				                FileUtils.writeStringToFile(new File(refPotentialFile), String.valueOf(refPotential));
-				        }
-					}
-					catch (IOException ioe)
-					{
-						ioe.printStackTrace();
-					}
-
-				}
-			});
-			task.addPropertyChangeListener(new PropertyChangeListener()
-			{
-
-				@Override
-				public void propertyChange(PropertyChangeEvent evt)
-				{
-					if ("progress" == evt.getPropertyName())
-					{
-
-//						int progress = (Integer) evt.getNewValue();
-//						gravityLoadingProgressMonitor.setProgress(progress);
-//						String message =
-//								String.format("Completed %d%%.\n", progress);
-//						gravityLoadingProgressMonitor.setNote(message);
-						if (gravityLoadingProgressMonitor.isCanceled() || task.isDone())
-						{
-							if (gravityLoadingProgressMonitor.isCanceled())
-							{
-								task.cancel(true);
-							}
-							else
-							{
-								//                    taskOutput.append("Task completed.\n");
-							}
-						}
-						//            this.pcs.firePropertyChange(Properties.MODEL_CHANGED, null, null);
-					}
-				}
-			});
-			task.execute();
-
-//	        // Now read in all results
-//	        System.out.println("Reading in the results");
-//	        for (int i = 0; i < coresToUse; i++) {
-//	            String basename = new File(objfile).getName();
-//	            File accFile = new File(outputFolder + File.separator + basename + "-acceleration.txt" + outfilename + i);
-//	            File potFile = new File(outputFolder + File.separator + basename + "-potential.txt" + outfilename + i);
-//	            results.addAll(readGravityResults(accFile, potFile));
-//
-//	            if (!keepGfiles) {
-//	                // we don't need these files so delete them
-//	                accFile.delete();
-//	                potFile.delete();
-//	            }
-//	        }
-//
-//	        if (howToEvalute != HowToEvaluate.EVALUATE_AT_POINTS_IN_FITS_FILE) {
-//	            refPotential = getRefPotential(results, minRefPotential);
-//	            System.out.println("Reference Potential = " + refPotential);
-//	            // save out reference potential to file so it can be loaded in again
-//	            if (saveRefPotential)
-//	                FileUtils.writeStringToFile(new File(refPotentialFile), String.valueOf(refPotential));
-//	        }
-//
 	        return results;
 	    }
 
@@ -1048,7 +973,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        return result;
 	    }
 
-	    public static void main(String[] args) throws Exception {
+	    public static void main(String[] args, ProgressStatusListener listener) throws Exception {
 
 	        long startTime = System.currentTimeMillis();
 
@@ -1263,7 +1188,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        List<GravityValues> gravAtLocations = null;
 
 	        if (howToEvalute == HowToEvaluate.EVALUATE_AT_CENTERS) {
-	            gravAtLocations = getGravityAtLocations(keepGfiles, gridType, gravConst);
+	            gravAtLocations = getGravityAtLocations(keepGfiles, gridType, gravConst, listener);
 	            saveResultsAtCenters(outfile, globalShapeModelPolyData,
 	                    PolyDataUtil2.getSigmasFromPolydata(globalShapeModelPolyData), gravAtLocations);
 	        } else if (howToEvalute == HowToEvaluate.EVALUATE_AT_POINTS_IN_FITS_FILE) {
@@ -1272,7 +1197,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	                System.exit(1);
 	            }
 	            System.out.println("SBMTDistributedGravity: main: running gravity for local fits");
-	            gravityForLocalFits(inputfitsfile, arg.configFile, gravConst, gridType, keepGfiles, altwgName);
+	            gravityForLocalFits(inputfitsfile, arg.configFile, gravConst, gridType, keepGfiles, altwgName, listener);
 
 	        }
 
@@ -1309,7 +1234,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 
 	    private static void gravityForLocalFits(String inputfitsfile, String configFile, double gravConst,
 	            GridType gridType,
-	            boolean keepGfiles, boolean altwgName) throws Exception {
+	            boolean keepGfiles, boolean altwgName, ProgressStatusListener listener) throws Exception {
 	    	System.out.println("SBMTDistributedGravity: gravityForLocalFits: ");
 	        if (configFile.length() > 0) {
 	            // check to see that config file exists.
@@ -1353,8 +1278,9 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        List<GravityValues> gravAtLocations = null;
 
 	        System.out.println("getting gravity at centers of fits file.");
-	        gravAtLocations = getGravityAtLocations(keepGfiles, gridType, gravConst);
-
+	        results.clear();
+	        gravAtLocations = getGravityAtLocations(keepGfiles, gridType, gravConst, listener);
+	        results.addAll(gravAtLocations);
 	        System.out.println("Saving gravity at centers of fits file");
 	        String tableFile = outfile + ".gravtab";
 	        saveResultsAtCenters(tableFile, fitspolydata, heightErrors, gravAtLocations);

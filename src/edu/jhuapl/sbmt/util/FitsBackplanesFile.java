@@ -7,7 +7,7 @@ import java.util.Map;
 
 import edu.jhuapl.sbmt.model.eros.MSIFits;
 
-import altwg.Fits.HeaderTags;
+import altwg.Fits.HeaderTag;
 import nom.tam.fits.HeaderCard;
 
 public class FitsBackplanesFile implements BackplanesFile
@@ -44,13 +44,13 @@ public class FitsBackplanesFile implements BackplanesFile
         //parse input filename. use as value for fits keyword DATASRCF
         String fileName = Paths.get(outputFile).getFileName().toString();
 
-        HeaderCard fitsHdrCard = new HeaderCard(HeaderTags.DATASRCF.toString(), source, null);
-        prevHeaderValues.put(HeaderTags.DATASRCF.toString(), fitsHdrCard);
+        HeaderCard fitsHdrCard = new HeaderCard(HeaderTag.DATASRCF.toString(), source, null);
+        prevHeaderValues.put(HeaderTag.DATASRCF.toString(), fitsHdrCard);
 
         //parse output fits name. use as value for fits keyword PRODNAME
         fileName = Paths.get(outputFile).getFileName().toString();
-        fitsHdrCard = new HeaderCard(HeaderTags.PRODNAME.toString(), fileName, null);
-        prevHeaderValues.put(HeaderTags.PRODNAME.toString(), fitsHdrCard);
+        fitsHdrCard = new HeaderCard(HeaderTag.PRODNAME.toString(), fileName, null);
+        prevHeaderValues.put(HeaderTag.PRODNAME.toString(), fitsHdrCard);
 
         MSIFits.savePlanes2Fits(imgData, planeList, outputFile, prevHeaderValues);
     }

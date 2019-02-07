@@ -1,5 +1,7 @@
 package edu.jhuapl.sbmt.util;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -19,8 +21,13 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.JOptionPane;
+import javax.swing.ProgressMonitor;
+import javax.swing.SwingWorker;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
+
+import edu.jhuapl.saavtk.util.ProgressStatusListener;
 
 
 public class MapMakerRemote
@@ -40,6 +47,8 @@ public class MapMakerRemote
     private double rotationRate;
     private double referencePotential;
     private String bodyLowestResModelName;
+    private static GravityTask task;
+	private static ProgressMonitor gravityLoadingProgressMonitor;
 
     public void setDatadir(String datadir)
     {
@@ -186,7 +195,43 @@ public class MapMakerRemote
             {
                 System.out.println("MapMakerRemote: runMapmaker: option " + option);
             }
-            SBMTDistributedGravity.main(dgOptionArray);
+            gravityLoadingProgressMonitor = new ProgressMonitor(null, "Generating gravity values", "", 0, 100);
+			gravityLoadingProgressMonitor.setProgress(0);
+
+			task = new GravityTask(dgOptionArray);
+			task.addPropertyChangeListener(new PropertyChangeListener()
+			{
+
+				@Override
+				public void propertyChange(PropertyChangeEvent evt)
+				{
+					if ("progress" == evt.getPropertyName())
+					{
+
+						int progress = (Integer) evt.getNewValue();
+						gravityLoadingProgressMonitor.setProgress(progress);
+						String message =
+								String.format("Completed %d%%.\n", progress);
+						gravityLoadingProgressMonitor.setNote(message);
+						if (gravityLoadingProgressMonitor.isCanceled() || task.isDone())
+						{
+							if (gravityLoadingProgressMonitor.isCanceled())
+							{
+								task.cancel(true);
+							}
+							else
+							{
+								//                    taskOutput.append("Task completed.\n");
+							}
+						}
+						//            this.pcs.firePropertyChange(Properties.MODEL_CHANGED, null, null);
+					}
+				}
+			});
+			task.execute();
+
+
+
         }
 
 //        String userpass = "sbmtAdmin:$mallBodies18!";
@@ -517,8 +562,51 @@ public class MapMakerRemote
         this.bodyLowestResModelName = bodyLowestResModelName;
     }
 
+    class GravityTask extends SwingWorker<Void, Void>
+    {
+    	private String[] dgOptionArray;
 
+    	public GravityTask(String[] dgOptionArray)
+    	{
+    		this.dgOptionArray = dgOptionArray;
+    	}
+
+    	@Override
+    	protected Void doInBackground() throws Exception
+    	{
+    		SBMTDistributedGravity.main(dgOptionArray, new ProgressStatusListener()
+    		{
+
+    			@Override
+    			public void setProgressStatus(String status, int progress)
+    			{
+    				task.setProgress(progress);
+    				gravityLoadingProgressMonitor.setNote(status);
+    			}
+    		});
+    		return null;
+    	}
+
+    	@Override
+    	protected void done()
+    	{
+    		// TODO Auto-generated method stub
+    		super.done();
+    		try
+			{
+				FileUtils.copyFile(new File(cacheDir + File.separator + "Test_FINAL.fits"), mapletFitsFile);
+			}
+    		 catch (IOException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+
+    }
 }
+
+
 
 class ParameterStringBuilder {
     public static String getParamsString(Map<String, String> params) throws UnsupportedEncodingException {
