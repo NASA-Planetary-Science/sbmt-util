@@ -46,7 +46,9 @@ import vtk.vtkOctreePointLocator;
 import vtk.vtkPolyData;
 import vtk.vtkPolyDataNormals;
 
-import edu.jhuapl.saavtk.util.PolyDataUtil;
+import edu.jhuapl.saavtk.util.FileUtil;
+import edu.jhuapl.saavtk.util.MathUtil;
+import edu.jhuapl.saavtk.util.NativeLibraryLoader;
 import edu.jhuapl.saavtk.util.ProgressStatusListener;
 
 import altwg.Fits.FitsHeaderType;
@@ -58,7 +60,6 @@ import altwg.util.AltwgDataType;
 import altwg.util.AltwgFits;
 import altwg.util.BatchType;
 import altwg.util.CellInfo;
-import altwg.util.FileUtil;
 import altwg.util.FitsData;
 import altwg.util.FitsData.FitsDataBuilder;
 import altwg.util.FitsHdr;
@@ -66,9 +67,7 @@ import altwg.util.FitsHdr.FitsHdrBuilder;
 import altwg.util.FitsUtil;
 import altwg.util.GridType;
 import altwg.util.JCommanderUsage;
-import altwg.util.MathUtil;
-import altwg.util.NativeLibraryLoader;
-import altwg.util.PolyDataUtil2;
+import altwg.util.PolyDataUtil;
 import altwg.util.StringUtil;
 import altwg.util.TiltUtil;
 import nom.tam.fits.FitsException;
@@ -551,7 +550,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        double[][][] outdata = new double[inputNumPlanes + planesToAdd][axes[1]][axes[2]];
 
 	        double[] pointOnPlane = new double[3];
-	        Rotation rot = PolyDataUtil2.fitPlaneToPolyData(fitspolydata, pointOnPlane);
+	        Rotation rot = altwg.util.PolyDataUtil2.fitPlaneToPolyData(fitspolydata, pointOnPlane);
 	        double[][] mat = rot.getMatrix();
 	        double[] ux = { mat[0][0], mat[1][0], mat[2][0] };
 	        double[] uz = { mat[0][2], mat[1][2], mat[2][2] };
@@ -656,7 +655,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	            System.out.println("ERROR! grav-pot file:\n" + potFile.getAbsolutePath() + " does not exist!");
 	        }
 
-	        accelerationVector.addAll(FileUtil.loadPointDataArray(accFile.getAbsolutePath(), 0));
+	        accelerationVector.addAll(altwg.util.FileUtil.loadPointDataArray(accFile.getAbsolutePath(), 0));
 	        potential.addAll(FileUtil.getFileLinesAsDoubleList(potFile.getAbsolutePath()));
 
 	        ArrayList<GravityValues> results = new ArrayList<GravityValues>();
@@ -862,7 +861,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	    // This function reads the reference potential from a file. It is assumed
 	    // the reference potential is the only word in the file.
 	    private static double getRefPotential(String filename) throws IOException {
-	        ArrayList<String> words = FileUtil.getFileWordsAsStringList(filename);
+	        ArrayList<String> words = altwg.util.FileUtil.getFileWordsAsStringList(filename);
 	        return Double.parseDouble(words.get(0));
 	    }
 
@@ -1170,18 +1169,18 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	            if (arg.sigmaFile.length() > 0) {
 	                // csv file
 	                String delimiter = ",";
-	                List<float[]> sigmasRead = PolyDataUtil2.readSigmaFile(new File(arg.sigmaFile), delimiter);
+	                List<float[]> sigmasRead = altwg.util.PolyDataUtil2.readSigmaFile(new File(arg.sigmaFile), delimiter);
 
 	                // sigmas are stored in 3rd column.
 	                int sigmaColumn = 3;
 	                // sigmas should have units of km (same units as shape model).
 	                double unitConversion = 1;
-	                PolyDataUtil2.addSigmaToPolydata(globalShapeModelPolyData, sigmasRead, sigmaColumn, unitConversion);
+	                altwg.util.PolyDataUtil2.addSigmaToPolydata(globalShapeModelPolyData, sigmasRead, sigmaColumn, sigmaScale, unitConversion);
 	            } else {
 	                // add sigma of 0 to all facets
 	                System.out.println("No sigma file passed by user! Setting all sigmas to 0 for"
 	                        + " error calculations.");
-	                PolyDataUtil2.zeroSigmaToPolydata(globalShapeModelPolyData);
+	                altwg.util.PolyDataUtil2.zeroSigmaToPolydata(globalShapeModelPolyData);
 	            }
 	        }
 
@@ -1252,7 +1251,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        }
 
 	        List<vtkFloatArray> ancillaryData = new ArrayList<>();
-	        vtkPolyData fitspolydata = PolyDataUtil2.loadLocalFitsLLRModel(inputfitsfile, ancillaryData);
+	        vtkPolyData fitspolydata = altwg.util.PolyDataUtil2.loadLocalFitsLLRModel(inputfitsfile, ancillaryData);
 
 	        // check if HEIGHT_STDERR is one of the planes. If so, use it as the vertex error. Otherwise use SIGMA.
 	        List<PlaneInfo> sourcePlanes = AltwgFits.planesFromFits(inputfitsfile);
@@ -1325,7 +1324,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 //                    "SBMTDistributedGravity: gravityForLocalFits: generating sun and eye vectors");
 	        // need to generate sun and eye vectors for calculating shaded relief
 	        double[] pointOnPlane = new double[3];
-	        Rotation rot = PolyDataUtil2.fitPlaneToPolyData(fitspolydata, pointOnPlane);
+	        Rotation rot = altwg.util.PolyDataUtil2.fitPlaneToPolyData(fitspolydata, pointOnPlane);
 
 	        // Put the sun pointing in direction vector that bisects ux and uz
 	        double[][] mat = rot.getMatrix();
