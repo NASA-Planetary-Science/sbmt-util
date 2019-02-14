@@ -330,7 +330,7 @@ public class SBMTGMTGridUtil {
             }
         }
 
-        System.out.printf("Data extents %f/%f/%f/%f\n", xmin, xmax, ymin, ymax);
+//        System.out.printf("Data extents %f/%f/%f/%f\n", xmin, xmax, ymin, ymax);
 
         ArrayList<Vector3> inputField = new ArrayList<>();
         for (int i = 0; i < transformed.size(); i++) {
@@ -355,14 +355,14 @@ public class SBMTGMTGridUtil {
         try
         {
             gmtSurfaceExe = getFile(getJarURI(), "misc/programs/gravity/macos/GMTSurface");
-            System.out.println(
-                    "SBMTGMTGridUtil: regridField: GMTSurface " + gmtSurfaceExe);
+//            System.out.println(
+//                    "SBMTGMTGridUtil: regridField: GMTSurface " + gmtSurfaceExe);
         }
         catch (URISyntaxException | FileNotFoundException e)
         {
             String path = new File("").getAbsolutePath();
-            System.out.println(
-                    "SBMTDistributedGravity: getGravityAtLocations: path is " + path);
+//            System.out.println(
+//                    "SBMTDistributedGravity: getGravityAtLocations: path is " + path);
             gmtSurfaceExe = getFile(URI.create("file://" + path), "/misc/programs/gravity/macos/GMTSurface");
             // TODO Auto-generated catch block
 //            e.printStackTrace();
@@ -370,14 +370,14 @@ public class SBMTGMTGridUtil {
 
         String command = String.format(gmtSurfaceExe.getPath() + " %s %12.8f %f/%f/%f/%f %s %s %s", inputGMT, groundSampleDistance,
                 xmin, xmax, ymin, ymax, outputNetCDF, outputFITS, additionalGMTArgs);
-        System.out.println("GMTGridUtil: regridField: command is " + command);
+//        System.out.println("GMTGridUtil: regridField: command is " + command);
         altwg.util.BatchSubmission.runProgramAndWait(command, null, false);
-        System.out.println("SBMTGMTGridUtil: regridField: outputting " + outputNetCDF + " to " + outputFITS);
+//        System.out.println("SBMTGMTGridUtil: regridField: outputting " + outputNetCDF + " to " + outputFITS);
         GriddedFits.orexNCToFits6(outputNetCDF, outputFITS);
 
         List<Vector3> surfaceField = new ArrayList<>();
         PiecewiseBicubicSplineInterpolatingFunction interpolator = readGMTFits(outputFITS, surfaceField);
-        System.out.println("SBMTGMTGridUtil: regridField: got interpolator");
+//        System.out.println("SBMTGMTGridUtil: regridField: got interpolator");
         if (globalXYZ == null) {
             if (evaluateAtCustomPoints) {
                 globalXYZ = evaluateXYZ;
@@ -398,7 +398,7 @@ public class SBMTGMTGridUtil {
                 globalXYZ = localToGlobal(surfaceXYZ);
             }
         }
-        System.out.println("SBMTGMTGridUtil: regridField: checking evaluate at custom points");
+//        System.out.println("SBMTGMTGridUtil: regridField: checking evaluate at custom points");
         if (evaluateAtCustomPoints) {
             surfaceField = new ArrayList<>();
             List<Vector3> transformedEvaluationPoints = globalToLocal(evaluateXYZ);
@@ -420,7 +420,7 @@ public class SBMTGMTGridUtil {
          6 - interpolated field value at vertex
          */
         double[][][] returnArray = new double[7][nX][nY];
-        System.out.println("SBMTGMTGridUtil: regridField: running through array points");
+//        System.out.println("SBMTGMTGridUtil: regridField: running through array points");
         for (int i = 0; i < globalXYZ.size(); i++) {
             LatitudinalCoordinates lc = new LatitudinalCoordinates(globalXYZ.get(i));
             int m = i / nX;
@@ -436,7 +436,7 @@ public class SBMTGMTGridUtil {
             returnArray[5][m][n] = globalXYZ.get(i).getElt(2);
             returnArray[6][m][n] = surfaceField.get(i).getElt(2); // Z coordinate is the regridded field
         }
-        System.out.println("SBMTGMTGridUtil: regridField: returing from regridding field");
+//        System.out.println("SBMTGMTGridUtil: regridField: returing from regridding field");
         return returnArray;
     }
 

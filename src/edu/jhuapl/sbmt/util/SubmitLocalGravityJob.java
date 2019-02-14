@@ -34,7 +34,7 @@ public class SubmitLocalGravityJob { //implements BatchSubmitI {
 	public SubmitLocalGravityJob(ArrayList<String> commandList, BatchType batchType) {
 		this.commandList = commandList;
 		this.batchType = batchType;
-		System.out.println("BatchSubmitLocal: BatchSubmitLocal: batch type is " + batchType);
+//		System.out.println("BatchSubmitLocal: BatchSubmitLocal: batch type is " + batchType);
 		cores = Runtime.getRuntime().availableProcessors();
 	}
 
@@ -56,7 +56,7 @@ public class SubmitLocalGravityJob { //implements BatchSubmitI {
 	public void limitCores(int limit)
 	{
 		cores = Math.min(limit, Runtime.getRuntime().availableProcessors());
-		System.out.println("limiting number of local cores to:" + cores);
+//		System.out.println("limiting number of local cores to:" + cores);
 	}
 
 	/**
@@ -84,7 +84,7 @@ public class SubmitLocalGravityJob { //implements BatchSubmitI {
 	 */
 	public boolean runBatchSubmitinDir(String workingDir, ProgressStatusListener listener, int maxPoints) throws InterruptedException, IOException {
 
-		System.out.println("BatchSubmitLocal: runBatchSubmitinDir:");
+//		System.out.println("BatchSubmitLocal: runBatchSubmitinDir:");
 		//evaluate workingDir. If empty string then set to null;
 		workingDir = emptyToNull(workingDir);
 
@@ -106,7 +106,6 @@ public class SubmitLocalGravityJob { //implements BatchSubmitI {
 			if (workingDir != null) {
 				System.out.println("Cannot run in specified working Dir using " + batchType.toString());
 			}
-			System.out.println("SubmitLocalGravityJob: runBatchSubmitinDir: max points " + maxPoints);
 			return runBatchSubmitProgramLocalMake(commandList, listener, maxPoints);
 
 		case LOCAL_PARALLEL:
@@ -143,9 +142,9 @@ public class SubmitLocalGravityJob { //implements BatchSubmitI {
 		BufferedReader br = new BufferedReader(isr);
 		String line;
 		if (showOutput) {
-			System.out.printf("Output of running %s is:\n", program);
+//			System.out.printf("Output of running %s is:\n", program);
 			while ((line = br.readLine()) != null) {
-				System.out.println(line);
+//				System.out.println(line);
 
 				if (listener != null)
 				{
@@ -155,7 +154,7 @@ public class SubmitLocalGravityJob { //implements BatchSubmitI {
 					}
 					if (line.startsWith("Time to evaluate total"))
 					{
-						listener.setProgressStatus("Done!", 100);
+//						listener.setProgressStatus("Done!", 100);
 						break;
 					}
 					if (line.startsWith("Time"))
@@ -174,7 +173,7 @@ public class SubmitLocalGravityJob { //implements BatchSubmitI {
 		}
 
 		int exitStatus = process.waitFor();
-		System.out.println("Program " + program + " finished with status: " + exitStatus);
+//		System.out.println("Program " + program + " finished with status: " + exitStatus);
 		br.close();
 		process.destroy();
 

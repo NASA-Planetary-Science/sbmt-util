@@ -397,7 +397,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	            throws IOException, FitsException {
 	        FileWriter ofs = new FileWriter(gravityfile);
 	        BufferedWriter out = new BufferedWriter(ofs);
-	        System.out.println("SBMTDistributedGravity: saveResultsAtCenters: saving results at centers");
+//	        System.out.println("SBMTDistributedGravity: saveResultsAtCenters: saving results at centers");
 	        List<String> cols = new ArrayList<String>();
 	        cols.add("X (km)");
 	        cols.add("Y (km)");
@@ -535,7 +535,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	    private static void saveResultsAtPointsInFitsFile(boolean altwgName, String configFile,
 	            String inputfitsfile, vtkPolyData fitspolydata, String outputfitsfile, List<GravityValues> gravAtLocations)
 	            throws Exception {
-	    	System.out.println("SBMTDistributedGravity: saveResultsAtPointsInFitsFile: saving results at point in FITS file");
+//	    	System.out.println("SBMTDistributedGravity: saveResultsAtPointsInFitsFile: saving results at point in FITS file");
 	        // Get the dimensions of the input fits file
 	        int[] axes = new int[3];
 	        double[][][] indata = FitsUtil.loadFits(inputfitsfile, axes);
@@ -645,7 +645,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	     */
 	    private static List<GravityValues> readGravityResults(File accFile, File potFile) throws IOException {
 
-	    	System.out.println("SBMTDistributedGravity: readGravityResults: reading gravity results");
+//	    	System.out.println("SBMTDistributedGravity: readGravityResults: reading gravity results");
 	        ArrayList<double[]> accelerationVector = new ArrayList<double[]>();
 	        ArrayList<Double> potential = new ArrayList<Double>();
 
@@ -697,7 +697,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	            throws InterruptedException, ExecutionException, IOException {
 
 	        ArrayList<String> commandList = new ArrayList<String>();
-	        System.out.println("SBMTDistributedGravity: getGravityAtLocations: get gravity at location");
+//	        System.out.println("SBMTDistributedGravity: getGravityAtLocations: get gravity at location");
 	        boolean useExternalBody = externalBody.length() > 0;
 
 	        long size = 0;
@@ -705,7 +705,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        if (howToEvalute == HowToEvaluate.EVALUATE_AT_CENTERS) {
 	            howToEvaluateSwitch = "centers";
 	            size = globalShapeModelPolyData.GetNumberOfCells();
-	            System.out.println("preparing to evaluate gravity for " + String.valueOf(size) + " centers");
+//	            System.out.println("preparing to evaluate gravity for " + String.valueOf(size) + " centers");
 	        } else if (howToEvalute == HowToEvaluate.EVALUATE_AT_POINTS_IN_FITS_FILE) {
 	            // if (useExternalBody) {
 	            // howToEvaluateSwitch = "file " + fieldpointsfile;
@@ -714,8 +714,8 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	            // }
 	            howToEvaluateSwitch = "file " + "\"" + fieldpointsfile + "\"";
 	            size = FileUtil.getNumberOfLinesInfile(fieldpointsfile);
-	            System.out.println("preparing to evaluate gravity for " + String.valueOf(size) + " records"
-	                    + " in fits file");
+//	            System.out.println("preparing to evaluate gravity for " + String.valueOf(size) + " records"
+//	                    + " in fits file");
 	        }
 
 	        String outfilename = new File(outfile).getName();
@@ -727,7 +727,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        // coresToUse exists only in this method and can be dynamically sized.
 	        int coresToUse = numCores;
 	        if (batchType.equals(gridBatchType)) {
-	            System.out.println("Determining job allocation for grid engine");
+//	            System.out.println("Determining job allocation for grid engine");
 	            coresToUse = 100;
 	        }
 
@@ -759,22 +759,22 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        try
             {
                 gravityExe = getFile(getJarURI(), "misc/programs/gravity/macos/gravity");
-                System.out.println(
-                        "SBMTDistributedGravity: getGravityAtLocations: gravityExe " + gravityExe);
+//                System.out.println(
+//                        "SBMTDistributedGravity: getGravityAtLocations: gravityExe " + gravityExe);
             }
             catch (URISyntaxException | FileNotFoundException e)
             {
                 String path = new File("").getAbsolutePath();
-                System.out.println(
-                        "SBMTDistributedGravity: getGravityAtLocations: path is " + path);
+//                System.out.println(
+//                        "SBMTDistributedGravity: getGravityAtLocations: path is " + path);
                 gravityExe = getFile(URI.create("file://" + path), "/misc/programs/gravity/macos/gravity");
                 // TODO Auto-generated catch block
 //                e.printStackTrace();
             }
-	        System.out.println(
-                    "SBMTDistributedGravity: getGravityAtLocations: gravityExe " + gravityExe);
-	        System.out.println(
-                    "SBMTDistributedGravity: getGravityAtLocations: output folder " + outputFolder);
+//	        System.out.println(
+//                    "SBMTDistributedGravity: getGravityAtLocations: gravityExe " + gravityExe);
+//	        System.out.println(
+//                    "SBMTDistributedGravity: getGravityAtLocations: output folder " + outputFolder);
 	        long stopId = 0;
 	        for (int i = 0; i < coresToUse; i++) {
 	            final long startId = i * chunk;
@@ -794,8 +794,8 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	                        density, rotationRate, gravityType.name().toLowerCase(), howToEvaluateSwitch, startId,
 	                        stopId, outfilename,  i, outputFolder, gravConstant, objfile);
 	            }
-	            System.out.println(
-                        "SBMTDistributedGravity: getGravityAtLocations: command is " + command);
+//	            System.out.println(
+//                        "SBMTDistributedGravity: getGravityAtLocations: command is " + command);
 	            commandList.add(command);
 	        }
 
@@ -828,11 +828,11 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        if (gridType.equals(GridType.LOCAL)) {
 	            batchDir = null;
 	        }
-	        System.out.println("SBMTDistributedGravity: getGravityAtLocations: stopid is " + stopId);
+//	        System.out.println("SBMTDistributedGravity: getGravityAtLocations: stopid is " + stopId);
 	        batchSubmit.runBatchSubmitinDir(batchDir, listener, (int)stopId);
 
 	        // Now read in all results
-	        System.out.println("Reading in the results");
+//	        System.out.println("Reading in the results");
 	        for (int i = 0; i < coresToUse; i++) {
 	            String basename = new File(objfile).getName();
 	            File accFile = new File(outputFolder + File.separator + basename + "-acceleration.txt" + outfilename + i);
@@ -848,7 +848,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 
 	        if (howToEvalute != HowToEvaluate.EVALUATE_AT_POINTS_IN_FITS_FILE) {
 	            refPotential = getRefPotential(results, minRefPotential);
-	            System.out.println("Reference Potential = " + refPotential);
+//	            System.out.println("Reference Potential = " + refPotential);
 	            // save out reference potential to file so it can be loaded in again
 	            if (saveRefPotential)
 	                FileUtils.writeStringToFile(new File(refPotentialFile), String.valueOf(refPotential));
@@ -868,7 +868,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 
 	    private static double getRefPotential(List<GravityValues> results, boolean minRefPotential) {
 	        int numFaces = globalShapeModelPolyData.GetNumberOfCells();
-	        System.out.println("SBMTDistributedGravity: getRefPotential: ");
+//	        System.out.println("SBMTDistributedGravity: getRefPotential: ");
 	        if (minRefPotential) {
 	            System.out.println("Using minimum Potential as gravity reference potential");
 	        } else {
@@ -1025,7 +1025,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        if (arg.cheng) {
 	            gravityType = GravityAlgorithmType.CHENG;
 	        }
-	        System.out.println("SBMTDistributedGravity: main: arg local fits" + arg.localFitsFname);
+//	        System.out.println("SBMTDistributedGravity: main: arg local fits" + arg.localFitsFname);
 	        if (arg.localFitsFname.length() > 0) {
 	            howToEvalute = HowToEvaluate.EVALUATE_AT_POINTS_IN_FITS_FILE;
 	            inputfitsfile = arg.localFitsFname;
@@ -1160,7 +1160,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        resolveFile = new File(outfile);
 	        outfile = resolveFile.getAbsolutePath();
 
-	        System.out.println(StringUtil.timenow() + ":starting DistributedGravity");
+//	        System.out.println(StringUtil.timenow() + ":starting DistributedGravity");
 
 	        NativeLibraryLoader.loadVtkLibraries();
 	        NativeLibraryLoader.loadSpiceLibraries();
@@ -1196,7 +1196,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	                System.out.println("Error: " + inputfitsfile + " does not exist.");
 	                System.exit(1);
 	            }
-	            System.out.println("SBMTDistributedGravity: main: running gravity for local fits");
+//	            System.out.println("SBMTDistributedGravity: main: running gravity for local fits");
 	            gravityForLocalFits(inputfitsfile, arg.configFile, gravConst, gridType, keepGfiles, altwgName, listener);
 
 	        }
@@ -1208,7 +1208,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	    }
 
 	    private static vtkPolyData getGlobalModel(String objfile) throws Exception {
-	    	System.out.println("SBMTDistributedGravity: getGlobalModel: ");
+//	    	System.out.println("SBMTDistributedGravity: getGlobalModel: ");
 	        vtkPolyData globalShapeModelPolyData = PolyDataUtil.loadOBJShapeModel(objfile);
 
 	        if (globalShapeModelPolyData.GetPointData().GetNormals() == null
@@ -1235,7 +1235,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	    private static void gravityForLocalFits(String inputfitsfile, String configFile, double gravConst,
 	            GridType gridType,
 	            boolean keepGfiles, boolean altwgName, ProgressStatusListener listener) throws Exception {
-	    	System.out.println("SBMTDistributedGravity: gravityForLocalFits: ");
+//	    	System.out.println("SBMTDistributedGravity: gravityForLocalFits: ");
 	        if (configFile.length() > 0) {
 	            // check to see that config file exists.
 	            if (!new File(configFile).exists()) {
@@ -1244,7 +1244,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	            }
 	        }
 
-	        System.out.println("Loading fits file to vtkpolydata");
+//	        System.out.println("Loading fits file to vtkpolydata");
 
 	        if (!new File(inputfitsfile).exists()) {
 	            System.out.println("Error: " + inputfitsfile + " does not exist.");
@@ -1270,22 +1270,22 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        }
 
 	        // Convert the fits file to ASCII
-	        System.out.println("converting fits to ascii.");
+//	        System.out.println("converting fits to ascii.");
 	        fieldpointsfile = outfile + ".fits2ascii";
 
 	        saveLocalFitsCenters(fitspolydata, fieldpointsfile);
 
 	        List<GravityValues> gravAtLocations = null;
 
-	        System.out.println("getting gravity at centers of fits file.");
+//	        System.out.println("getting gravity at centers of fits file.");
 	        results.clear();
 	        gravAtLocations = getGravityAtLocations(keepGfiles, gridType, gravConst, listener);
 	        results.addAll(gravAtLocations);
-	        System.out.println("Saving gravity at centers of fits file");
+//	        System.out.println("Saving gravity at centers of fits file");
 	        String tableFile = outfile + ".gravtab";
 	        saveResultsAtCenters(tableFile, fitspolydata, heightErrors, gravAtLocations);
 
-	        System.out.println("Regridding to go to fits points.");
+//	        System.out.println("Regridding to go to fits points.");
 
 	        // regrid the gravity values to go from values at facet center to values at points in the fits file
 	        // Get the dimensions of the input fits file and load fits cube into 3D array
@@ -1295,10 +1295,10 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        int nY = axes[2];
 
 	        double[][][] regriddedGravity = regridToLocalFitsPoints(inputfitsfile, indata, nX, nY,
-	                fitspolydata, gravAtLocations);
+	                fitspolydata, gravAtLocations, listener);
 
-	        System.out.println(
-                    "SBMTDistributedGravity: gravityForLocalFits: done with regridding");
+//	        System.out.println(
+//                    "SBMTDistributedGravity: gravityForLocalFits: done with regridding");
 	        // load fits header from input fits file to get rotation and translation information, as
 	        // well as gsd scaling.
 	        Map<String, HeaderCard> headerMap = FitsUtil.getFitsHeaderAsMap(inputfitsfile);
@@ -1321,8 +1321,8 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	            gsd = gsd / scalFactor;
 	        }
 
-	        System.out.println(
-                    "SBMTDistributedGravity: gravityForLocalFits: generating sun and eye vectors");
+//	        System.out.println(
+//                    "SBMTDistributedGravity: gravityForLocalFits: generating sun and eye vectors");
 	        // need to generate sun and eye vectors for calculating shaded relief
 	        double[] pointOnPlane = new double[3];
 	        Rotation rot = PolyDataUtil2.fitPlaneToPolyData(fitspolydata, pointOnPlane);
@@ -1356,7 +1356,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        }
 
 	        int numInputPlanes = axes[0];
-	        System.out.println("number of input planes:" + numInputPlanes);
+//	        System.out.println("number of input planes:" + numInputPlanes);
 	        double[][][] outData = new double[numInputPlanes + planesToAdd][nX][nY];
 
 	        // copy the planes from the input fits file to output planes first
@@ -1417,15 +1417,15 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        }
 	        // assume that evaluating to points in fits file means output is not global
 	        boolean isGlobal = false;
-	        System.out.println(
-                    "SBMTDistributedGravity: gravityForLocalFits: saving to fits");
+//	        System.out.println(
+//                    "SBMTDistributedGravity: gravityForLocalFits: saving to fits");
 	        saveToFits(isGlobal, configFile, altwgName, outData, inputfitsfile, outfile);
 
 	    }
 
 	    private static void saveToFits(boolean isGlobal, String configFile, boolean altwgName, double[][][] outData,
 	            String inputfitsfile, String outfile) throws FitsException, IOException {
-	    	System.out.println("SBMTDistributedGravity: saveToFits: ");
+//	    	System.out.println("SBMTDistributedGravity: saveToFits: ");
 	        // construct fitsData. Will contain data array plus information pertaining to data array
 	        FitsDataBuilder dataBuilder = new FitsDataBuilder(outData, isGlobal);
 	        dataBuilder.setAltProdType(AltwgDataType.DTM);
@@ -1455,7 +1455,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 
 	        // extract the planes in the original fits file as a list.
 	        List<PlaneInfo> planeList = AltwgFits.planesFromFits(inputfitsfile);
-	        System.out.println("Number of planes based on planelist from input fits file:" + planeList.size());
+//	        System.out.println("Number of planes based on planelist from input fits file:" + planeList.size());
 
 	        // append list of planes that were added by this method.
 	        for (AltwgDataType anciFitsType : AltwgDataType.gravityPlanes) {
@@ -1465,7 +1465,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	                String errMesg = "ERROR! No PlaneInfo associated with AltwgProducType:" + anciFitsType.toString();
 	                throw new RuntimeException(errMesg);
 	            }
-	            System.out.println("SBMTDistributedGravity: saveToFits: adding plane " + thisPlane);
+//	            System.out.println("SBMTDistributedGravity: saveToFits: adding plane " + thisPlane);
 	            planeList.add(thisPlane);
 	        }
 //	      planeList.add(PlaneInfo.NORM_VECTOR_X);
@@ -1487,10 +1487,10 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	            planeList.add(PlaneInfo.TILT_DIRECTION);
 	        }
 
-	        System.out.println("total number of planes, after adding gravity:" + planeList.size());
+//	        System.out.println("total number of planes, after adding gravity:" + planeList.size());
 
 	        // AltwgProductType altwgProduct = AltwgProductType.DTM;
-	        System.out.println(StringUtil.timenow() + ":saving local fits to " + outfile);
+//	        System.out.println(StringUtil.timenow() + ":saving local fits to " + outfile);
 
 	        // assume evaluation at points in fits file only happens for local fits
 	        FitsHeaderType hdrType = FitsHeaderType.DTMLOCALALTWG;
@@ -1501,8 +1501,8 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	    // are at the vertices.
 	    private static double[][][] regridToLocalFitsPoints(String inputfitsfile, double[][][] indata,
 	            int nX, int nY, vtkPolyData fitspolydata,
-	            List<GravityValues> gravAtLocations) throws Exception {
-	    	System.out.println("SBMTDistributedGravity: regridToLocalFitsPoints: ");
+	            List<GravityValues> gravAtLocations, ProgressStatusListener listener) throws Exception {
+//	    	System.out.println("SBMTDistributedGravity: regridToLocalFitsPoints: ");
 	        // load fits header from input fits file to get rotation and translation information, as
 	        // well as gsd scaling.
 	        Map<String, HeaderCard> headerMap = FitsUtil.getFitsHeaderAsMap(inputfitsfile);
@@ -1557,7 +1557,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        // the
 	        // x, y, z positions at each pixel.
 	        List<PlaneInfo> sourcePlanes = AltwgFits.planesFromFits(inputfitsfile);
-	        gmtUtil = setEvalPoints(gmtUtil, indata, nX, nY, sourcePlanes);
+	        gmtUtil = setEvalPoints(gmtUtil, indata, nX, nY, sourcePlanes, listener);
 
 	        // set rotation and translation
 	        gmtUtil.setRotation(rotation);
@@ -1574,7 +1574,8 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        // loop through all the gravity indices to regrid
 	        int outIndex = 0;
 	        for (GridIndex thisIndex : regridInds) {
-	            System.out.println("working on index:" + thisIndex.index());
+	        	listener.setProgressStatus("Regridding Index " + thisIndex.index() + " of " + (regridInds.size()+2), 99);
+//	            System.out.println("working on index:" + thisIndex.index());
 	            gmtUtil.setField(centerArr[thisIndex.index()]);
 
 	            // regridded array always consists of 7 planes: lat, lon, radius, x, y, z, field value.
@@ -1596,8 +1597,9 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	            }
 	            outIndex++;
 	        }
-	        System.out.println(
-                    "SBMTDistributedGravity: regridToLocalFitsPoints: returning " + gravRegridded);
+//	        System.out.println(
+//                    "SBMTDistributedGravity: regridToLocalFitsPoints: returning " + gravRegridded);
+	        listener.setProgressStatus("Done!", 100);
 	        return gravRegridded;
 	    }
 
@@ -1610,7 +1612,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	     * @throws IOException
 	     */
 	    private static void saveLocalFitsCenters(vtkPolyData fitspolyData, String fieldpointsfile) throws IOException {
-	    	System.out.println("SBMTDistributedGravity: saveLocalFitsCenters: ");
+//	    	System.out.println("SBMTDistributedGravity: saveLocalFitsCenters: ");
 	        int numCells = fitspolyData.GetNumberOfCells();
 	        vtkIdList cellPointIDS = new vtkIdList();
 
@@ -1648,8 +1650,8 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	    }
 
 	    private static SBMTGMTGridUtil setEvalPoints(SBMTGMTGridUtil gmt, double[][][] data, int nX, int nY,
-	            List<PlaneInfo> fitsPlanes) {
-	    	System.out.println("SBMTDistributedGravity: setEvalPoints: ");
+	            List<PlaneInfo> fitsPlanes, ProgressStatusListener listener) {
+//	    	System.out.println("SBMTDistributedGravity: setEvalPoints: ");
 	        int xIndex = fitsPlanes.indexOf(PlaneInfo.X);
 	        int yIndex = fitsPlanes.indexOf(PlaneInfo.Y);
 	        int zIndex = fitsPlanes.indexOf(PlaneInfo.Z);
@@ -1695,7 +1697,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	     * @return
 	     */
 	    private static double[][] valuesToRegrid(List<GravityValues> gravAtLocations, vtkPolyData polyData) {
-	    	System.out.println("SBMTDistributedGravity: valuesToRegrid: ");
+//	    	System.out.println("SBMTDistributedGravity: valuesToRegrid: ");
 	        int numCells = polyData.GetNumberOfCells();
 
 	        int numGravPlanes = regridInds.size();
@@ -1759,7 +1761,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	     */
 	    public static FitsHdrBuilder parseGravityHeader(String gravityFile, FitsHdrBuilder hdrBuilder)
 	            throws HeaderCardException, IOException {
-	    	System.out.println("SBMTDistributedGravity: parseGravityHeader: ");
+//	    	System.out.println("SBMTDistributedGravity: parseGravityHeader: ");
 	        // public static void gravityToFitsMap(String gravityFile, Map<String, HeaderCard> infitsMap)
 	        // throws IOException, HeaderCardException {
 	        InputStream fs = new FileInputStream(gravityFile);

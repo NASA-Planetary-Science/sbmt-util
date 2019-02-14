@@ -89,7 +89,7 @@ public class MapMakerRemote
 
     public void runMapmaker() throws Exception
     {
-        System.out.println("MapMakerRemote: runMapmaker: running mapmaker");
+//        System.out.println("MapMakerRemote: runMapmaker: running mapmaker");
 
         int n = 0;
         if (SystemUtils.IS_OS_MAC_OSX)
@@ -131,13 +131,13 @@ public class MapMakerRemote
         args.put("mapoutdir", mapoutdir);
 
         String arguments = constructUrlArguments(args);
-        System.out.println("MapMakerRemote: runMapmaker: doing query; outputdirectory " + outputFolder);
+//        System.out.println("MapMakerRemote: runMapmaker: doing query; outputdirectory " + outputFolder);
         doQuery("http://sbmt.jhuapl.edu/admin/joshtest/index01.php", arguments);
 
-        System.out.println("MapMakerRemote: runMapmaker: returned from running query");
+//        System.out.println("MapMakerRemote: runMapmaker: returned from running query");
         if (n == 1)
         {
-            System.out.println("MapMakerRemote: runMapmaker: running Distributed Gravity rotation rate " + rotationRate + " ref pot " + referencePotential + " density " + density);
+//            System.out.println("MapMakerRemote: runMapmaker: running Distributed Gravity rotation rate " + rotationRate + " ref pot " + referencePotential + " density " + density);
             // Assemble options for calling DistributedGravity
 //            File tempFolder = new File("/Users/steelrj1/Desktop/");
 //            File objShapeFile = new File("/Users/steelrj1/Desktop/shape0.obj");
@@ -191,10 +191,10 @@ public class MapMakerRemote
             // 24. Distance to plane
             // 25. Shaded relief
             String[] dgOptionArray = dgOptionList.toArray(new String[dgOptionList.size()]);
-            for (String option : dgOptionArray)
-            {
-                System.out.println("MapMakerRemote: runMapmaker: option " + option);
-            }
+//            for (String option : dgOptionArray)
+//            {
+//                System.out.println("MapMakerRemote: runMapmaker: option " + option);
+//            }
             gravityLoadingProgressMonitor = new ProgressMonitor(null, "Generating gravity values", "", 0, 100);
 			gravityLoadingProgressMonitor.setProgress(0);
 
@@ -474,7 +474,7 @@ public class MapMakerRemote
         con.setRequestProperty("User-Agent", "Java client");
         con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 
-        System.out.println("MapMakerRemote: doQuery: setting up auth");
+//        System.out.println("MapMakerRemote: doQuery: setting up auth");
         String userpass = "sbmtAdmin:$mallBodies18!";
         String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userpass.getBytes()));
         con.setRequestProperty ("Authorization", basicAuth);
