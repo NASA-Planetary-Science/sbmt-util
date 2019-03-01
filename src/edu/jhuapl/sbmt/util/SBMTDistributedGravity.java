@@ -68,6 +68,7 @@ import altwg.util.FitsUtil;
 import altwg.util.GridType;
 import altwg.util.JCommanderUsage;
 import altwg.util.PolyDataUtil;
+import altwg.util.SigmaFileType;
 import altwg.util.StringUtil;
 import altwg.util.TiltUtil;
 import nom.tam.fits.FitsException;
@@ -188,165 +189,177 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	    private static BatchType gridBatchType;
 	    private static String inputfitsfile;
 	    private static String externalBody;
+	    private static double sigmaScale;
 
 	    private static class Arguments {
 
-	        private final String commandDescription = ToolsVersion.getVersionString()
-	                + "\n\n"
-	                + "This program computes the gravitational acceleration and potential of a\n"
-	                + "shape model at specified points and saves the values to files. Unlike the\n"
-	                + "gravity program which is a single threaded program, this one is designed\n"
-	                + "run in distributed manner by dividing the computation into multiple jobs\n"
-	                + "and running them in parallel on one or more machines.\n\n";
+			private final String commandDescription = ToolsVersion.getVersionString()
+					+ "\n\n"
+					+ "This program computes the gravitational acceleration and potential of a\n"
+					+ "shape model at specified points and saves the values to files. Unlike the\n"
+					+ "gravity program which is a single threaded program, this one is designed\n"
+					+ "run in distributed manner by dividing the computation into multiple jobs\n"
+					+ "and running them in parallel on one or more machines.\n\n";
 
-	        @Parameter(names = "-help", help = true)
-	        private boolean help;
+			@Parameter(names = "-help", help = true)
+			private boolean help;
 
-	        @Parameter(names = "-d", order = 0, description = "Density of shape model in g/cm^3, default is 1.0", required = false)
-	        private double density = 1D;
+			@Parameter(names = "-d", order = 0, description = "Density of shape model in g/cm^3, default is 1.0", required = false)
+			private double density = 1D;
 
-	        @Parameter(names = "-r", order = 1, description = "Rotation rate of shape model in radians/sec, default is 1.0", required = false)
-	        private double rotationRate = 1D;
+			@Parameter(names = "-r", order = 1, description = "Rotation rate of shape model in radians/sec, default is 1.0", required = false)
+			private double rotationRate = 1D;
 
-	        @Parameter(names = "--werner", order = 2, description = "Use the Werner algorithm for computing the gravity (this is the "
-	                + "default if neither --werner or --cheng option provided)", required = false)
-	        private boolean werner = true;
+			@Parameter(names = "--werner", order = 2, description = "Use the Werner algorithm for computing the gravity (this is the "
+					+ "default if neither --werner or --cheng option provided)", required = false)
+			private boolean werner = true;
 
-	        @Parameter(names = "--cheng", order = 3, description = "Use Andy Cheng's algorithm for computing the gravity (default is to "
-	                + "use Werner method if neither --werner or --cheng option provided)", required = false)
-	        private boolean cheng = false;
+			@Parameter(names = "--cheng", order = 3, description = "Use Andy Cheng's algorithm for computing the gravity (default is to "
+					+ "use Werner method if neither --werner or --cheng option provided)", required = false)
+			private boolean cheng = false;
 
-	        @Parameter(names = "--centers", order = 4, description = "Evaluate gravity directly at the centers of plates of <platemodelfile> "
-	                + "and output as an ASCII file. ", required = false)
-	        private boolean centers = true;
+			@Parameter(names = "--centers", order = 4, description = "Evaluate gravity directly at the centers of plates of <platemodelfile> "
+					+ "and output as an ASCII file. ", required = false)
+			private boolean centers = true;
 
-	        @Parameter(names = "--min-ref-potential", order = 5, description = "If this argument is present, the code will use the minimum reference potential as "
-	                + "the reference potential. By default the code calculates an average gravitational "
-	                + "potential as the reference potential. Note that the --fits-local option still "
-	                + "requires the user to specify --ref-potential as the code cannot calculate a reference "
-	                + "potential from the fits file.", required = false)
-	        private boolean minRefPotential = false;
+			@Parameter(names = "--min-ref-potential", order = 5, description = "If this argument is present, the code will use the minimum reference potential as "
+					+ "the reference potential. By default the code calculates an average gravitational "
+					+ "potential as the reference potential. Note that the --fits-local option still "
+					+ "requires the user to specify --ref-potential as the code cannot calculate a reference "
+					+ "potential from the fits file.", required = false)
+			private boolean minRefPotential = false;
 
-	        @Parameter(names = "--fits-local", order = 6, description = "<filename> Evaluate gravity at points specified in a FITS file and output as a fits file."
-	                + "It is assumed the <filename> FITS file represents a local surface region "
-	                + "(e.g. a maplet or mapola) and contains at least 6 planes with the first 6 "
-	                + "planes being lat, lon, rad, x, y, and z. "
-	                + "The output FITS file will try to follow the ALTWG fits header and file naming "
-	                + "convention. It will try to preserve the input fits header tags which follow the ALTWG "
-	                + "fits header convention, i.e. 'mphase', 'datasrc', 'datasrcv'."
-	                + "The output file will contain the original planes of the input FITS file and append the"
-	                + "gravity planes."
-	                + "NOTE: the tool will always create an ascii table file that contains the gravity values at the"
-	                + "facet centers of the shape model defined by the vertices of the fits file. The ascii table filename"
-	                + " will be <out-file>.gravtab", required = false)
-	        private String localFitsFname = "";
+			@Parameter(names = "--fits-local", order = 6, description = "<filename> Evaluate gravity at points specified in a FITS file and output as a fits file."
+					+ "It is assumed the <filename> FITS file represents a local surface region "
+					+ "(e.g. a maplet or mapola) and contains at least 6 planes with the first 6 "
+					+ "planes being lat, lon, rad, x, y, and z. "
+					+ "The output FITS file will try to follow the ALTWG fits header and file naming "
+					+ "convention. It will try to preserve the input fits header tags which follow the ALTWG "
+					+ "fits header convention, i.e. 'mphase', 'datasrc', 'datasrcv'."
+					+ "The output file will contain the original planes of the input FITS file and append the"
+					+ "gravity planes."
+					+ "NOTE: the tool will always create an ascii table file that contains the gravity values at the"
+					+ "facet centers of the shape model defined by the vertices of the fits file. The ascii table filename"
+					+ " will be <out-file>.gravtab", required = false)
+			private String localFitsFname = "";
 
-	        @Parameter(names = "--ref-potential", order = 7, description = "<value> If the --fits-local option is provided, then you must use this option to specify the "
-	                + "reference potential (in J/kg) which is needed for calculating elevation. This option is "
-	                + "ignored if --fits-local is not provided. Can be either a number or a path to a "
-	                + "file containing the number (the number must be the only contents of the file)", required = false)
-	        private String refPotential = "";
+			@Parameter(names = "--ref-potential", order = 7, description = "<value> If the --fits-local option is provided, then you must use this option to specify the "
+					+ "reference potential (in J/kg) which is needed for calculating elevation. This option is "
+					+ "ignored if --fits-local is not provided. Can be either a number or a path to a "
+					+ "file containing the number (the number must be the only contents of the file)", required = false)
+			private String refPotential = "";
 
-	        @Parameter(names = "--save-ref-potential", order = 8, description = "<path> Save the reference potential computed by this program to a file at <path>.", required = false)
-	        private String refPotSaveFname = "";
+			@Parameter(names = "--save-ref-potential", order = 8, description = "<path> Save the reference potential computed by this program to a file at <path>.", required = false)
+			private String refPotSaveFname = "";
 
-	        @Parameter(names = "--output-folder", order = 9, description = "<folder> Path to folder in which to place output files. These are temporary files created by "
-	                + "gravity executable (default is current directory).", required = false)
-	        private String outputFolder = "";
+			@Parameter(names = "--output-folder", order = 9, description = "<folder> Path to folder in which to place output files. These are temporary files created by "
+					+ "gravity executable (default is current directory).", required = false)
+			private String outputFolder = "";
 
-	        @Parameter(names = "--num-jobs", order = 10, description = "<numJobs> Specify the maximum allowed number of simultaneous jobs for the "
-	                + "local computer (for batch type local). This should be equal to "
-	                + "or less than number of cores on the local computer. If num-jobs is less than actual number of cores "
-	                + "on the local machine the program will respect it and run on the specified number of cores. "
-	                + "Be careful! No error checking is done to determine whether <numJobs> is greater than the actual "
-	                + "number of CPUs on the local machine!"
-	                + " Defaults to 1.", required = false)
-	        private int numJobs = 1;
+			@Parameter(names = "--num-jobs", order = 10, description = "<numJobs> Specify the maximum allowed number of simultaneous jobs for the "
+					+ "local computer (for batch type local). This should be equal to "
+					+ "or less than number of cores on the local computer. If num-jobs is less than actual number of cores "
+					+ "on the local machine the program will respect it and run on the specified number of cores. "
+					+ "Be careful! No error checking is done to determine whether <numJobs> is greater than the actual "
+					+ "number of CPUs on the local machine!"
+					+ " Defaults to 1.", required = false)
+			private int numJobs = 1;
 
-	        @Parameter(names = "--tilt-radius", order = 11, description = "<value> Radius to use for computing basic tilts. Radius units in km. "
-	                + "If this argument is not specified then tilt values will NOT be written to output fits file. "
-	                + "NOTE: If output is NOT a fits file then no tilts will be written at all, regardless of this argument. "
-	                + "At each point the tilt of all plates within the specified radius is used to "
-	                + "compute the tilt and tilt direction.\n "
-	                + "This argument is only kept to allow backwards compatibility with older versions of the software."
-	                + "It is highly recommended that Shape2Tilt be used instead to calculate the tilts."
-	                + "The tilt radius should be no bigger than about 2 to 3 times the mean spacing of "
-	                + "the points where the gravity is being evaluated. A larger tilt radius will result "
-	                + "in very long running times. Note also that all plates within the radius are included "
-	                + "even if those plates are not connected via some path along the surface to the tilt "
-	                + "point. This would only happen with highly irregular geometry in which the surface "
-	                + "somehow almost folds over itself.", required = false)
-	        private double tiltRadius = Double.NaN;
+			@Parameter(names = "--tilt-radius", order = 11, description = "<value> Radius to use for computing basic tilts. Radius units in km. "
+					+ "If this argument is not specified then tilt values will NOT be written to output fits file. "
+					+ "NOTE: If output is NOT a fits file then no tilts will be written at all, regardless of this argument. "
+					+ "At each point the tilt of all plates within the specified radius is used to "
+					+ "compute the tilt and tilt direction.\n "
+					+ "This argument is only kept to allow backwards compatibility with older versions of the software."
+					+ "It is highly recommended that Shape2Tilt be used instead to calculate the tilts."
+					+ "The tilt radius should be no bigger than about 2 to 3 times the mean spacing of "
+					+ "the points where the gravity is being evaluated. A larger tilt radius will result "
+					+ "in very long running times. Note also that all plates within the radius are included "
+					+ "even if those plates are not connected via some path along the surface to the tilt "
+					+ "point. This would only happen with highly irregular geometry in which the surface "
+					+ "somehow almost folds over itself.", required = false)
+			private double tiltRadius = Double.NaN;
 
-	        @Parameter(names = "--gravConst", order = 12, description = "<value> Allow user to change the value for the gravitational constant. Units are in "
-	                + "m^3/kgs^2. If not passed then will use the default value of 6.67384e-11.", required = false)
-	        private double gravConst = 6.67384e-11;
+			@Parameter(names = "--gravConst", order = 12, description = "<value> Allow user to change the value for the gravitational constant. Units are in "
+					+ "m^3/kgs^2. If not passed then will use the default value of 6.67384e-11.", required = false)
+			private double gravConst = 6.67384e-11;
 
-	        @Parameter(names = "--batch-type", order = 13, description = "<grid|local> The gravity program can take a very long time for large shape models;"
-	                + " to mitigate it this program supports 2 forms of parallelization, grid or local. In either case,"
-	                + " the program first divides the computation into chunks. For 'grid' the program computes the"
-	                + " number of chunks needed. For 'local' (the default batch type), the program utilizes"
-	                + " the number of CPUs as specified by <numJobs>. Be careful: the program does NOT check whether"
-	                + " <numJobs> is greater than the number of CPUs on the local machine! This could result in "
-	                + " slower processing time or out of memory errors! If <numJobs>"
-	                + " is less than the number of CPUs on the local machine then program will run on only <numJobs> CPUs. ", required = false)
-	        private String batchType = "local";
+			@Parameter(names = "--batch-type", order = 13, description = "<grid|local> The gravity program can take a very long time for large shape models;"
+					+ " to mitigate it this program supports 2 forms of parallelization, grid or local. In either case,"
+					+ " the program first divides the computation into chunks. For 'grid' the program computes the"
+					+ " number of chunks needed. For 'local' (the default batch type), the program utilizes"
+					+ " the number of CPUs as specified by <numJobs>. Be careful: the program does NOT check whether"
+					+ " <numJobs> is greater than the number of CPUs on the local machine! This could result in "
+					+ " slower processing time or out of memory errors! If <numJobs>"
+					+ " is less than the number of CPUs on the local machine then program will run on only <numJobs> CPUs. ", required = false)
+			private String batchType = "local";
 
-	        @Parameter(names = "--num-slots", order = 14, description = "<numSlots> Specify the number of slots "
-	                + " to be taken by an individual job submitted to the grid engine. Allowed values are"
-	                + " 2, 3, 4, 6, 8, 16, or 32. Choose a value which will limit the number of simultaneous jobs per node"
-	                + " to four or less in order to minimize out-of-memory errors. Note that a job will not run on a node"
-	                + " if the node has less than <numSlots> available. Thus, a cluster which has nodes that have a maximum"
-	                + " of 4 slots each will not be able to run any jobs if <numSlots> is greater than 4."
-	                + " This argument will only apply if --batch-type = grid."
-	                + " Defaults to 4 slots per job.", required = false)
-	        private int numSlots = 4;
+			@Parameter(names = "--num-slots", order = 14, description = "<numSlots> Specify the number of slots "
+					+ " to be taken by an individual job submitted to the grid engine. Allowed values are"
+					+ " 2, 3, 4, 6, 8, 16, or 32. Choose a value which will limit the number of simultaneous jobs per node"
+					+ " to four or less in order to minimize out-of-memory errors. Note that a job will not run on a node"
+					+ " if the node has less than <numSlots> available. Thus, a cluster which has nodes that have a maximum"
+					+ " of 4 slots each will not be able to run any jobs if <numSlots> is greater than 4."
+					+ " This argument will only apply if --batch-type = grid."
+					+ " Defaults to 4 slots per job.", required = false)
+			private int numSlots = 4;
 
-	        @Parameter(names = "--altwgNaming", order = 15, description = "If the --fits-local option is provided, the output is saved to a fits file."
-	                + " Enabling this option names the output fits file according to the ALTWG Naming convention. This"
-	                + " supercedes the <out-file> specified. If <out-file> contains a path then the altwg named"
-	                + " output file will be saved in that same path. Otherwise the altwg named output file will"
-	                + " be written in the current working directory.", required = false)
-	        private boolean altwgNaming = false;
+			@Parameter(names = "--altwgNaming", order = 15, description = "If the --fits-local option is provided, the output is saved to a fits file."
+					+ " Enabling this option names the output fits file according to the ALTWG Naming convention. This"
+					+ " supercedes the <out-file> specified. If <out-file> contains a path then the altwg named"
+					+ " output file will be saved in that same path. Otherwise the altwg named output file will"
+					+ " be written in the current working directory.", required = false)
+			private boolean altwgNaming = false;
 
-	        @Parameter(names = "--keepGfiles", order = 16, description = " Keep the raw intermediate gravity files produced by the gravity c++ executable instead of deleting them. "
-	                + "Useful for debugging purposes. Default is to delete them.", required = false)
-	        private boolean keepGFiles = false;
+			@Parameter(names = "--keepGfiles", order = 16, description = " Keep the raw intermediate gravity files produced by the gravity c++ executable instead of deleting them. "
+					+ "Useful for debugging purposes. Default is to delete them.", required = false)
+			private boolean keepGFiles = false;
 
-	        @Parameter(names = "--configFile", order = 17, description = " Fits configuration file. Only used if creating an output DTM fits file, which only happens if user wants"
-	                + " gravity evaluated at points in a local fits file. Supercedes keyword values in the input fits header.", required = false)
-	        private String configFile = "";
+			@Parameter(names = "--configFile", order = 17, description = " Fits configuration file. Only used if creating an output DTM fits file, which only happens if user wants"
+					+ " gravity evaluated at points in a local fits file. Supercedes keyword values in the input fits header.", required = false)
+			private String configFile = "";
 
-	        // @Parameter(names = "--externalBody", order = 18, description = "mass and position of external body in kg and
-	        // km (body fixed coordinates). "
-	        // + "e.g. -externalBody 7.342e22,-2.8933e5,2.4802e5,-1.3891e5", required = false)
-	        // private String externalBody = "";
+			// @Parameter(names = "--externalBody", order = 18, description = "mass and position of external body in kg and
+			// km (body fixed coordinates). "
+			// + "e.g. -externalBody 7.342e22,-2.8933e5,2.4802e5,-1.3891e5", required = false)
+			// private String externalBody = "";
 
-	        @Parameter(names = "--massUncertainty", order = 18, description = " Fractional uncertainty in the total mass.  Default value is 0.01.", required = false)
-	        private double massUncertainty = 0.01;
+			@Parameter(names = "--massUncertainty", order = 18, description = " Fractional uncertainty in the total mass.  Default value is 0.01.", required = false)
+			private double massUncertainty = 0.01;
 
-	        @Parameter(names = "--sigma-global", order = 19, description = "Shape model radial vertex errors read from <filename>.  "
-	                + "Ignored if --fits-local is specified.  If not present, calculated tilt uncertainties will be zero. Format of sigma file "
-	                + "is 4 column csv where the columns are: vertex x, y, z, and the sigma value.\n")
-	        private String sigmaFile = "";
+			@Parameter(names = "--sigma-global", order = 19, description = "Shape model radial vertex errors read from <filename>.  "
+					+ "Ignored if --fits-local is specified.  If not present, calculated tilt uncertainties will be zero. Format of sigma file "
+					+ "is 4 column csv where the columns are: vertex x, y, z, and the sigma value.\n")
+			private String sigmaFile = "";
 
-	        @Parameter(description = "Usage: DistributedGravity [options] <platemodelfile> <out-file>\n\n"
-	                + "Where:\n"
-	                + "  <platemodelfile>       Path to global shape model file in OBJ format.\n"
-	                + "  <out-file>             Path to output file which will contain all results.\n"
-	                + "                         For --centers, <out-file> is an ascii file containing results at the\n"
-	                + "                         facet centers.\n"
-	                + "                         For --fits-local, <out-file> is a FITS DTM containing all the planes\n"
-	                + "                         of the <fits-filename> plus gravity results appended as additional\n"
-	                + "                         planes. The tool also creates a separate ascii file named\n"
-	                + "                         <out-file>.gravtab that contains the results at the facet centers.\n"
-	                + "                         ")
+			@Parameter(names = "--sigmaFileType", order = 20, description = "If present then will parse the sigma file based"
+					+ " on the file format defined for that type. Supported types are 'spc' or 'errorfromsql'"
+					+ " (case-insensitive). If not specified then the default format is 'spc'."
+					+ " The SPC sigma file format is 4 column csv where the columns are:"
+					+ " vertex x,y,z and the sigma value.")
+			private String sigmaFileType = "";
 
-	        private List<String> files = new ArrayList<>();
+			@Parameter(names = "--sigmaScale", order = 21, description = "scale sigma values by value.  Only used when read from file"
+					+ " for the global case. Defaults to 1 if not set.")
+			private double sigmaScale = 1D;
 
-	        @Parameter(names = "-shortDescription", hidden = true)
-	        private boolean shortDescription = false;
-	    }
+			@Parameter(description = "Usage: DistributedGravity [options] <platemodelfile> <out-file>\n\n"
+					+ "Where:\n"
+					+ "  <platemodelfile>       Path to global shape model file in OBJ format.\n"
+					+ "  <out-file>             Path to output file which will contain all results.\n"
+					+ "                         For --centers, <out-file> is an ascii file containing results at the\n"
+					+ "                         facet centers.\n"
+					+ "                         For --fits-local, <out-file> is a FITS DTM containing all the planes\n"
+					+ "                         of the <fits-filename> plus gravity results appended as additional\n"
+					+ "                         planes. The tool also creates a separate ascii file named\n"
+					+ "                         <out-file>.gravtab that contains the results at the facet centers.\n"
+					+ "                         ")
+
+			private List<String> files = new ArrayList<>();
+
+			@Parameter(names = "-shortDescription", hidden = true)
+			private boolean shortDescription = false;
+		}
 
 	    // From
 	    // https://stackoverflow.com/questions/523871/best-way-to-concatenate-list-of-string-objects
@@ -988,6 +1001,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        outputFolder = ".";
 	        batchType = BatchType.LOCAL_PARALLEL_MAKE;
 	        inputfitsfile = null;
+	        SigmaFileType sigmaType = SigmaFileType.SPCSIGMA;
 
 	        // default to Sun Open Grid Engine. Currently this is the only supported grid engine.
 	        // re-enable the --gridType argument if support is added for other grid engines.
@@ -1019,6 +1033,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        density = arg.density;
 	        rotationRate = arg.rotationRate;
 	        massUncertainty2 = arg.massUncertainty * arg.massUncertainty;
+	        sigmaScale = arg.sigmaScale;
 
 	        // gravity algorithm
 	        if (arg.cheng) {
@@ -1168,8 +1183,8 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        if (howToEvalute == HowToEvaluate.EVALUATE_AT_CENTERS) {
 	            if (arg.sigmaFile.length() > 0) {
 	                // csv file
-	                String delimiter = ",";
-	                List<float[]> sigmasRead = altwg.util.PolyDataUtil2.readSigmaFile(new File(arg.sigmaFile), delimiter);
+//	                String delimiter = ",";
+	                List<float[]> sigmasRead = altwg.util.PolyDataUtil2.readSigmaFile(new File(arg.sigmaFile), sigmaType);
 
 	                // sigmas are stored in 3rd column.
 	                int sigmaColumn = 3;
@@ -1189,7 +1204,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        if (howToEvalute == HowToEvaluate.EVALUATE_AT_CENTERS) {
 	            gravAtLocations = getGravityAtLocations(keepGfiles, gridType, gravConst, listener);
 	            saveResultsAtCenters(outfile, globalShapeModelPolyData,
-	                    PolyDataUtil2.getSigmasFromPolydata(globalShapeModelPolyData), gravAtLocations);
+	            		altwg.util.PolyDataUtil2.getSigmasFromPolydata(globalShapeModelPolyData), gravAtLocations);
 	        } else if (howToEvalute == HowToEvaluate.EVALUATE_AT_POINTS_IN_FITS_FILE) {
 	            if (!new File(inputfitsfile).exists()) {
 	                System.out.println("Error: " + inputfitsfile + " does not exist.");
