@@ -60,7 +60,6 @@ public class MapMakerRemote
         this.mapoutdir = mapoutdir;
     }
 
-
     private String mapoutdir;
 
     public static void main(String[] args) throws IOException
@@ -69,8 +68,6 @@ public class MapMakerRemote
 
         try
         {
-
-
             remote.runMapmaker();
         }
         catch (Exception e)
@@ -82,8 +79,6 @@ public class MapMakerRemote
 
     public MapMakerRemote() throws IOException
     {
-
-
     }
 
 
