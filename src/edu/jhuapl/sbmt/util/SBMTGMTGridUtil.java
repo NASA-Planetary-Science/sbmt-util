@@ -347,8 +347,8 @@ public class SBMTGMTGridUtil {
         // create a random 8 character string
         String name = RandomStringUtils.randomAlphabetic(8);
         String inputGMT = new File(tmpDir, name + "_gmt-input.bin").getPath();
-        String outputNetCDF = new File(tmpDir, name + "_surface-output.grd").getPath();
-        String outputFITS = new File(tmpDir, name + "_surface-output.fits").getPath();
+        String outputNetCDF = new File(tmpDir, name + "_surface-output.grd").getAbsolutePath();
+        String outputFITS = new File(tmpDir, name + "_surface-output.fits").getAbsolutePath();
         writeBinaryGMTInput(inputField, inputGMT);
 
         URI gmtSurfaceExe;
@@ -373,7 +373,7 @@ public class SBMTGMTGridUtil {
 //        System.out.println("GMTGridUtil: regridField: command is " + command);
         altwg.util.BatchSubmission.runProgramAndWait(command, null, false);
 //        System.out.println("SBMTGMTGridUtil: regridField: outputting " + outputNetCDF + " to " + outputFITS);
-        GriddedFits.orexNCToFits6(outputNetCDF, outputFITS);
+        	GriddedFits.orexNCToFits6(outputNetCDF, outputFITS);
 
         List<Vector3> surfaceField = new ArrayList<>();
         PiecewiseBicubicSplineInterpolatingFunction interpolator = readGMTFits(outputFITS, surfaceField);

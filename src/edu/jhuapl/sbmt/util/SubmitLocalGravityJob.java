@@ -150,10 +150,12 @@ public class SubmitLocalGravityJob { //implements BatchSubmitI {
 				{
 					if (line.startsWith("Initialization"))
 					{
+						System.out.println("SubmitLocalGravityJob: runProgramAndWait: starting");
 						listener.setProgressStatus("Starting Gravity Generation....", 1);
 					}
 					if (line.startsWith("Time to evaluate total"))
 					{
+						System.out.println("SubmitLocalGravityJob: runProgramAndWait: breaking");
 //						listener.setProgressStatus("Done!", 100);
 						break;
 					}
@@ -161,8 +163,8 @@ public class SubmitLocalGravityJob { //implements BatchSubmitI {
 					{
 						int progress = Integer.parseInt(line.split(" ")[4]);
 						int percentage = (int)((float)progress*100.0/(float)maxPoints);
-//						System.out.println("SubmitLocalGravityJob: runProgramAndWait: progress is " + progress + " and max points " + maxPoints);
-//						System.out.println("SubmitLocalGravityJob: runProgramAndWait: setting percentage to " + (int)((float)progress*100.0/(float)maxPoints));
+						System.out.println("SubmitLocalGravityJob: runProgramAndWait: progress is " + progress + " and max points " + maxPoints);
+						System.out.println("SubmitLocalGravityJob: runProgramAndWait: setting percentage to " + (int)((float)progress*100.0/(float)maxPoints));
 						listener.setProgressStatus(line, percentage);
 					}
 

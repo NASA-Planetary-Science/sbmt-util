@@ -49,6 +49,7 @@ import vtk.vtkPolyDataNormals;
 import edu.jhuapl.saavtk.util.FileUtil;
 import edu.jhuapl.saavtk.util.MathUtil;
 import edu.jhuapl.saavtk.util.NativeLibraryLoader;
+import edu.jhuapl.saavtk.util.PolyDataUtil;
 import edu.jhuapl.saavtk.util.ProgressStatusListener;
 
 import altwg.Fits.FitsHeaderType;
@@ -67,7 +68,6 @@ import altwg.util.FitsHdr.FitsHdrBuilder;
 import altwg.util.FitsUtil;
 import altwg.util.GridType;
 import altwg.util.JCommanderUsage;
-import altwg.util.PolyDataUtil;
 import altwg.util.SigmaFileType;
 import altwg.util.StringUtil;
 import altwg.util.TiltUtil;
