@@ -23,6 +23,7 @@ import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
+import javax.swing.SwingWorker.StateValue;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -224,6 +225,13 @@ public class MapMakerRemote
 				}
 			});
 			task.execute();
+			while (task.getState() != StateValue.DONE)
+			{
+				System.out.println("MapMakerRemote: runMapmaker: Waiting for gravity to finish");
+				try { Thread.currentThread().sleep(5000); }
+	            catch(InterruptedException e) {}
+			}
+			System.out.println("MapMakerRemote: runMapmaker: task executed");
 
 
 
@@ -436,7 +444,7 @@ public class MapMakerRemote
         return mapletFitsFile;
     }
 
-    public File getOutputFolder()
+	public File getOutputFolder()
     {
         return outputFolder;
     }
@@ -589,7 +597,8 @@ public class MapMakerRemote
     		super.done();
     		try
 			{
-				FileUtils.copyFile(new File(cacheDir + File.separator + "Test_FINAL.fits"), mapletFitsFile);
+
+				FileUtils.copyFile(new File(cacheDir + File.separator + name + "_FINAL.fits"), mapletFitsFile);
 			}
     		 catch (IOException e)
 			{
