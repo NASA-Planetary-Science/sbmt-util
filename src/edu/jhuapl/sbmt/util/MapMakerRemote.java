@@ -133,7 +133,7 @@ public class MapMakerRemote
 //        System.out.println("MapMakerRemote: runMapmaker: returned from running query");
         if (n == 1)
         {
-//            System.out.println("MapMakerRemote: runMapmaker: running Distributed Gravity rotation rate " + rotationRate + " ref pot " + referencePotential + " density " + density);
+            System.out.println("MapMakerRemote: runMapmaker: running Distributed Gravity rotation rate " + rotationRate + " ref pot " + referencePotential + " density " + density);
             // Assemble options for calling DistributedGravity
 //            File tempFolder = new File("/Users/steelrj1/Desktop/");
 //            File objShapeFile = new File("/Users/steelrj1/Desktop/shape0.obj");
@@ -227,11 +227,9 @@ public class MapMakerRemote
 			task.execute();
 			while (task.getState() != StateValue.DONE)
 			{
-				System.out.println("MapMakerRemote: runMapmaker: Waiting for gravity to finish");
 				try { Thread.currentThread().sleep(5000); }
 	            catch(InterruptedException e) {}
 			}
-			System.out.println("MapMakerRemote: runMapmaker: task executed");
 
 
 

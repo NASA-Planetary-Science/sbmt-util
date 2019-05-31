@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -1216,8 +1215,8 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        }
 
 	        long stopTime = System.currentTimeMillis();
-	        System.out.printf("Time taken %d minutes\n", TimeUnit.MILLISECONDS.toMinutes(stopTime - startTime));
-	        System.out.println(StringUtil.timenow() + ":done DistributedGravity");
+//	        System.out.printf("Time taken %d minutes\n", TimeUnit.MILLISECONDS.toMinutes(stopTime - startTime));
+//	        System.out.println(StringUtil.timenow() + ":done DistributedGravity");
 
 	    }
 
