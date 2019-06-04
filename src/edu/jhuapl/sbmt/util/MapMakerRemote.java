@@ -93,7 +93,7 @@ public class MapMakerRemote
 	        Object[] options = {"Just run Mapmaker",
 	                "Run Distributed Gravity"};
 	        n = JOptionPane.showOptionDialog(null,
-	        "This will run mapmaker remotely and return a FITS file; do you want to also run Distributed Gravity locally?",
+	        "This will run mapmaker remotely and return a FITS file; do you want to also run Gravity locally? Depending on the parameters, this may take a while.",
 	        "Run Distributed Gravity?",
 	        JOptionPane.YES_NO_CANCEL_OPTION,
 	        JOptionPane.QUESTION_MESSAGE,
