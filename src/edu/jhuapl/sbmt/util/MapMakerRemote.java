@@ -86,7 +86,7 @@ public class MapMakerRemote
 
     public void runMapmaker(MapmakerRemoteSwingWorker remoteSwingWorker) throws Exception
     {
-//        System.out.println("MapMakerRemote: runMapmaker: running mapmaker");
+        System.out.println("MapMakerRemote: runMapmaker: running mapmaker with swingworker " + remoteSwingWorker);
 
         int n = 0;
         if (SystemUtils.IS_OS_MAC_OSX)
