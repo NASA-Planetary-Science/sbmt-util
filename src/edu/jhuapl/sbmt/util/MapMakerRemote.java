@@ -154,7 +154,9 @@ public class MapMakerRemote
             dgOptionList.add("" + referencePotential);    //reference potential
             dgOptionList.add("--output-folder");
             dgOptionList.add(cacheDir);
-            dgOptionList.add("/Users/steelrj1/.sbmt/cache/2/" + bodyLowestResModelName);
+            String cacheRoot = lowResModelPath.substring(0, lowResModelPath.lastIndexOf("2") + 2);
+            System.out.println("MapMakerRemote: runMapmaker: cacheRoot " + cacheRoot);
+            dgOptionList.add(cacheRoot + bodyLowestResModelName);
 //            dgOptionList.add(lowResModelPath); // Global shape model file, Olivier suggests lowest res .OBJ **/
             dgOptionList.add(dgFitsFile.getPath()); // Path to output file that will contain all results
 //            dgOptionList.add("/Users/steelrj1/Desktop");
