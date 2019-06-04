@@ -129,7 +129,7 @@ public class MapMakerRemote
 
         String arguments = constructUrlArguments(args);
 //        System.out.println("MapMakerRemote: runMapmaker: doing query; outputdirectory " + outputFolder);
-        doQuery("http://sbmt.jhuapl.edu/index01.php", arguments);
+        doQuery("http://sbmt.jhuapl.edu/admin/joshtest/index01.php", arguments);
 
 //        System.out.println("MapMakerRemote: runMapmaker: returned from running query");
         if (n == 1 && !remoteSwingWorker.isCancelled())
@@ -478,17 +478,20 @@ public class MapMakerRemote
         con.setRequestProperty("User-Agent", "Java client");
         con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 
-//        System.out.println("MapMakerRemote: doQuery: setting up auth");
+        System.out.println("MapMakerRemote: doQuery: setting up auth");
         String userpass = "sbmtAdmin:$mallBodies18!";
         String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userpass.getBytes()));
         con.setRequestProperty ("Authorization", basicAuth);
 
+        System.out.println("MapMakerRemote: doQuery: url is " + url.toString());
+        System.out.println("MapMakerRemote: doQuery: connection " + con.toString());
         byte[] postData = data.getBytes(StandardCharsets.UTF_8);
         try (DataOutputStream wr = new DataOutputStream(con.getOutputStream())) {
             wr.write(postData);
         }
 
         int status = con.getResponseCode();
+        System.out.println("MapMakerRemote: doQuery: response code is " + status);
         if( status == HttpURLConnection.HTTP_OK )
         {
             InputStream is = con.getInputStream();
@@ -499,6 +502,7 @@ public class MapMakerRemote
             while (-1 != (len = is.read(buffer))) {
               bos.write(buffer, 0, len);
             }
+            System.out.println("MapMakerRemote: doQuery: trying to write " + cacheDir + File.separator + name + ".fits");
             outputStream = new FileOutputStream(cacheDir + File.separator + name + ".fits");
             try
             {
@@ -506,11 +510,13 @@ public class MapMakerRemote
                outputStream.close();
                con.disconnect();
                mapletFitsFile = new File(cacheDir + File.separator + name + ".fits");
+               System.out.println("MapMakerRemote: doQuery: query complete");
                return outputStream;
             }
             catch (Exception e)
             {
-                System.out.println("MapMakerRemote: doQuery: " + e);
+                System.out.println("!!!!!!!!!!!!!!!!!MapMakerRemote: caught exception: doQuery: " + e);
+                e.printStackTrace();
                 con.disconnect();
                 return null;
             }
