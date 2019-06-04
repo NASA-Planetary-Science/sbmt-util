@@ -29,6 +29,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import edu.jhuapl.saavtk.util.ProgressStatusListener;
+import edu.jhuapl.sbmt.dtm.service.mapmakers.MapmakerRemoteSwingWorker;
 
 
 public class MapMakerRemote
@@ -65,17 +66,17 @@ public class MapMakerRemote
 
     public static void main(String[] args) throws IOException
     {
-        MapMakerRemote remote = new MapMakerRemote();
-
-        try
-        {
-            remote.runMapmaker();
-        }
-        catch (Exception e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+//        MapMakerRemote remote = new MapMakerRemote();
+//
+//        try
+//        {
+//            remote.runMapmaker();
+//        }
+//        catch (Exception e)
+//        {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
     }
 
     public MapMakerRemote() throws IOException
@@ -83,7 +84,7 @@ public class MapMakerRemote
     }
 
 
-    public void runMapmaker() throws Exception
+    public void runMapmaker(MapmakerRemoteSwingWorker remoteSwingWorker) throws Exception
     {
 //        System.out.println("MapMakerRemote: runMapmaker: running mapmaker");
 
@@ -94,7 +95,7 @@ public class MapMakerRemote
 	                "Run Gravity"};
 	        n = JOptionPane.showOptionDialog(null,
 	        "This will run mapmaker remotely and return a FITS file; do you want to also run Gravity locally? Depending on the parameters, this may take a while.",
-	        "Run Distributed Gravity?",
+	        "Run Gravity?",
 	        JOptionPane.YES_NO_CANCEL_OPTION,
 	        JOptionPane.QUESTION_MESSAGE,
 	        null,
@@ -131,9 +132,9 @@ public class MapMakerRemote
         doQuery("http://sbmt.jhuapl.edu/admin/joshtest/index01.php", arguments);
 
 //        System.out.println("MapMakerRemote: runMapmaker: returned from running query");
-        if (n == 1)
+        if (n == 1 && !remoteSwingWorker.isCancelled())
         {
-            System.out.println("MapMakerRemote: runMapmaker: running Distributed Gravity rotation rate " + rotationRate + " ref pot " + referencePotential + " density " + density);
+//            System.out.println("MapMakerRemote: runMapmaker: running Distributed Gravity rotation rate " + rotationRate + " ref pot " + referencePotential + " density " + density);
             // Assemble options for calling DistributedGravity
 //            File tempFolder = new File("/Users/steelrj1/Desktop/");
 //            File objShapeFile = new File("/Users/steelrj1/Desktop/shape0.obj");
