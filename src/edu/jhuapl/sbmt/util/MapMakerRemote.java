@@ -87,7 +87,7 @@ public class MapMakerRemote
     public void runMapmaker(MapmakerRemoteSwingWorker remoteSwingWorker) throws Exception
     {
         System.out.println("MapMakerRemote: runMapmaker: running mapmaker with swingworker " + remoteSwingWorker);
-
+        System.out.println("MapMakerRemote: runMapmaker: is windows " + SystemUtils.IS_OS_WINDOWS);
         int n = 0;
         if (SystemUtils.IS_OS_MAC_OSX)
     	{
@@ -111,6 +111,7 @@ public class MapMakerRemote
     	}
         else if (SystemUtils.IS_OS_WINDOWS)
         {
+        	System.out.println("MapMakerRemote: runMapmaker: showing windows dialog");
         	JOptionPane.showMessageDialog(null,
     				"Please note: only basic FITS file generation is available on this platform at the current time.  Backplanes generated from the gravity executable are not available on Windows; "
     				+ "you will have to generate these backplanes manually",
@@ -128,10 +129,11 @@ public class MapMakerRemote
         args.put("mapoutdir", mapoutdir);
 
         String arguments = constructUrlArguments(args);
+        System.out.println("MapMakerRemote: runMapmaker: arguments " + arguments);
 //        System.out.println("MapMakerRemote: runMapmaker: doing query; outputdirectory " + outputFolder);
         doQuery("http://sbmt.jhuapl.edu/admin/joshtest/index01.php", arguments);
 
-//        System.out.println("MapMakerRemote: runMapmaker: returned from running query");
+        System.out.println("MapMakerRemote: runMapmaker: returned from running query");
         if (n == 1 && !remoteSwingWorker.isCancelled())
         {
 //            System.out.println("MapMakerRemote: runMapmaker: running Distributed Gravity rotation rate " + rotationRate + " ref pot " + referencePotential + " density " + density);
