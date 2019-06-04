@@ -91,7 +91,7 @@ public class MapMakerRemote
         if (SystemUtils.IS_OS_MAC_OSX)
     	{
 	        Object[] options = {"Just run Mapmaker",
-	                "Run Distributed Gravity"};
+	                "Run Gravity"};
 	        n = JOptionPane.showOptionDialog(null,
 	        "This will run mapmaker remotely and return a FITS file; do you want to also run Gravity locally? Depending on the parameters, this may take a while.",
 	        "Run Distributed Gravity?",
