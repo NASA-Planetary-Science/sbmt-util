@@ -86,8 +86,8 @@ public class MapMakerRemote
 
     public void runMapmaker(MapmakerRemoteSwingWorker remoteSwingWorker) throws Exception
     {
-        System.out.println("MapMakerRemote: runMapmaker: running mapmaker with swingworker " + remoteSwingWorker);
-        System.out.println("MapMakerRemote: runMapmaker: is windows " + SystemUtils.IS_OS_WINDOWS);
+//        System.out.println("MapMakerRemote: runMapmaker: running mapmaker");
+
         int n = 0;
         if (SystemUtils.IS_OS_MAC_OSX)
     	{
@@ -111,7 +111,6 @@ public class MapMakerRemote
     	}
         else if (SystemUtils.IS_OS_WINDOWS)
         {
-        	System.out.println("MapMakerRemote: runMapmaker: showing windows dialog");
         	JOptionPane.showMessageDialog(null,
     				"Please note: only basic FITS file generation is available on this platform at the current time.  Backplanes generated from the gravity executable are not available on Windows; "
     				+ "you will have to generate these backplanes manually",
@@ -129,11 +128,9 @@ public class MapMakerRemote
         args.put("mapoutdir", mapoutdir);
 
         String arguments = constructUrlArguments(args);
-        System.out.println("MapMakerRemote: runMapmaker: arguments " + arguments);
 //        System.out.println("MapMakerRemote: runMapmaker: doing query; outputdirectory " + outputFolder);
         doQuery("http://sbmt.jhuapl.edu/admin/joshtest/index01.php", arguments);
 
-        System.out.println("MapMakerRemote: runMapmaker: returned from running query");
         if (n == 1 && !remoteSwingWorker.isCancelled())
         {
 //            System.out.println("MapMakerRemote: runMapmaker: running Distributed Gravity rotation rate " + rotationRate + " ref pot " + referencePotential + " density " + density);
@@ -158,7 +155,6 @@ public class MapMakerRemote
             dgOptionList.add("--output-folder");
             dgOptionList.add(cacheDir);
             String cacheRoot = lowResModelPath.substring(0, lowResModelPath.lastIndexOf("2") + 2);
-            System.out.println("MapMakerRemote: runMapmaker: cacheRoot " + cacheRoot);
             dgOptionList.add(cacheRoot + bodyLowestResModelName);
 //            dgOptionList.add(lowResModelPath); // Global shape model file, Olivier suggests lowest res .OBJ **/
             dgOptionList.add(dgFitsFile.getPath()); // Path to output file that will contain all results
@@ -480,20 +476,17 @@ public class MapMakerRemote
         con.setRequestProperty("User-Agent", "Java client");
         con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 
-        System.out.println("MapMakerRemote: doQuery: setting up auth");
+//        System.out.println("MapMakerRemote: doQuery: setting up auth");
         String userpass = "sbmtAdmin:$mallBodies18!";
         String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userpass.getBytes()));
         con.setRequestProperty ("Authorization", basicAuth);
 
-        System.out.println("MapMakerRemote: doQuery: url is " + url.toString());
-        System.out.println("MapMakerRemote: doQuery: connection " + con.toString());
         byte[] postData = data.getBytes(StandardCharsets.UTF_8);
         try (DataOutputStream wr = new DataOutputStream(con.getOutputStream())) {
             wr.write(postData);
         }
 
         int status = con.getResponseCode();
-        System.out.println("MapMakerRemote: doQuery: response code is " + status);
         if( status == HttpURLConnection.HTTP_OK )
         {
             InputStream is = con.getInputStream();
@@ -504,7 +497,6 @@ public class MapMakerRemote
             while (-1 != (len = is.read(buffer))) {
               bos.write(buffer, 0, len);
             }
-            System.out.println("MapMakerRemote: doQuery: trying to write " + cacheDir + File.separator + name + ".fits");
             outputStream = new FileOutputStream(cacheDir + File.separator + name + ".fits");
             try
             {
@@ -512,13 +504,11 @@ public class MapMakerRemote
                outputStream.close();
                con.disconnect();
                mapletFitsFile = new File(cacheDir + File.separator + name + ".fits");
-               System.out.println("MapMakerRemote: doQuery: query complete");
                return outputStream;
             }
             catch (Exception e)
             {
-                System.out.println("!!!!!!!!!!!!!!!!!MapMakerRemote: caught exception: doQuery: " + e);
-                e.printStackTrace();
+                System.out.println("MapMakerRemote: doQuery: " + e);
                 con.disconnect();
                 return null;
             }
