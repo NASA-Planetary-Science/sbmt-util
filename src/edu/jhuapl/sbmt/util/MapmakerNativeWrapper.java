@@ -35,6 +35,7 @@ public class MapmakerNativeWrapper implements Runnable
     private double pixelSize;
     private File outputFolder;
     private File mapletFitsFile;
+    private final String processName;
 
     public MapmakerNativeWrapper(String mapmakerRootDir) throws IOException
     {
@@ -73,6 +74,7 @@ public class MapmakerNativeWrapper implements Runnable
         }
 
         new File(processName).setExecutable(true);
+        this.processName = processName;
         processCommand.add(processName);
     }
 
