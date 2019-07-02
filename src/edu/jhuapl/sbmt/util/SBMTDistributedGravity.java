@@ -770,8 +770,8 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        try
             {
                 gravityExe = getFile(getJarURI(), "misc/programs/gravity/macos/gravity");
-//                System.out.println(
-//                        "SBMTDistributedGravity: getGravityAtLocations: gravityExe " + gravityExe);
+                System.out.println(
+                        "SBMTDistributedGravity: getGravityAtLocations: gravityExe " + gravityExe);
             }
             catch (URISyntaxException | FileNotFoundException e)
             {
