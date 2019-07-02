@@ -769,7 +769,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        URI gravityExe;
 	        try
             {
-                gravityExe = getFile(getJarURI(), "misc/programs/gravity/macos/gravity");
+                gravityExe = getFile(getJarURI(), "/misc/programs/gravity/macos/gravity");
                 System.out.println(
                         "SBMTDistributedGravity: getGravityAtLocations: gravityExe " + gravityExe);
             }
@@ -1812,7 +1812,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	    }
 
 
-	    private static URI getJarURI()
+	    public static URI getJarURI()
 	            throws URISyntaxException
 	        {
 	            final ProtectionDomain domain;

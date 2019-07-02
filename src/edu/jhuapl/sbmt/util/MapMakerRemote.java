@@ -194,7 +194,7 @@ public class MapMakerRemote
 //            }
             gravityLoadingProgressMonitor = new ProgressMonitor(null, "Generating gravity values", "", 0, 100);
 			gravityLoadingProgressMonitor.setProgress(0);
-
+			System.out.println("MapMakerRemote: runMapmaker: jar URI " + SBMTDistributedGravity.getJarURI());
 			task = new GravityTask(dgOptionArray);
 			task.addPropertyChangeListener(new PropertyChangeListener()
 			{
