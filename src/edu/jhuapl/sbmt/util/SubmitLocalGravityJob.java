@@ -131,6 +131,7 @@ public class SubmitLocalGravityJob { //implements BatchSubmitI {
 	public boolean runProgramAndWait(String program, File workingDirectory, ProgressStatusListener listener, int maxPoints) throws IOException,
 	InterruptedException {
 
+		System.out.println("SubmitLocalGravityJob: runProgramAndWait: program is " + program + " and working directory " + workingDirectory);
 //		return runAndWait(program, workingDirectory, showOutput);
 		ProcessBuilder processBuilder = new ProcessBuilder(program.split("\\s+"));
 		processBuilder.directory(workingDirectory);
@@ -175,13 +176,13 @@ public class SubmitLocalGravityJob { //implements BatchSubmitI {
 		}
 
 		int exitStatus = process.waitFor();
-//		System.out.println("Program " + program + " finished with status: " + exitStatus);
+		System.out.println("Program " + program + " finished with status: " + exitStatus);
 		br.close();
 		process.destroy();
 
 		if (exitStatus != 0) {
 			System.out.println("Terminating since subprogram failed.");
-			System.exit(exitStatus);
+//			System.exit(exitStatus);
 		}
 
 		return exitStatus == 0;
