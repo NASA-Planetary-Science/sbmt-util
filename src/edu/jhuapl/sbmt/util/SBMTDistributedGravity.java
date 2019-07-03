@@ -1178,11 +1178,12 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        resolveFile = new File(outfile);
 	        outfile = resolveFile.getAbsolutePath();
 
-//	        System.out.println(StringUtil.timenow() + ":starting DistributedGravity");
+	        System.out.println(StringUtil.timenow() + ":starting DistributedGravity");
 
 	        NativeLibraryLoader.loadVtkLibraries();
 	        NativeLibraryLoader.loadSpiceLibraries();
 
+	        System.out.println("SBMTDistributedGravity: main: getting global model ");
 	        globalShapeModelPolyData = getGlobalModel(objfile);
 	        if (howToEvalute == HowToEvaluate.EVALUATE_AT_CENTERS) {
 	            if (arg.sigmaFile.length() > 0) {
@@ -1204,7 +1205,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        }
 
 	        List<GravityValues> gravAtLocations = null;
-
+	        System.out.println("SBMTDistributedGravity: main: getting gravity at location");
 	        if (howToEvalute == HowToEvaluate.EVALUATE_AT_CENTERS) {
 	            gravAtLocations = getGravityAtLocations(keepGfiles, gridType, gravConst, listener);
 	            saveResultsAtCenters(outfile, globalShapeModelPolyData,
@@ -1214,14 +1215,14 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	                System.out.println("Error: " + inputfitsfile + " does not exist.");
 	                System.exit(1);
 	            }
-//	            System.out.println("SBMTDistributedGravity: main: running gravity for local fits");
+	            System.out.println("SBMTDistributedGravity: main: running gravity for local fits");
 	            gravityForLocalFits(inputfitsfile, arg.configFile, gravConst, gridType, keepGfiles, altwgName, listener);
 
 	        }
 
 	        long stopTime = System.currentTimeMillis();
 //	        System.out.printf("Time taken %d minutes\n", TimeUnit.MILLISECONDS.toMinutes(stopTime - startTime));
-//	        System.out.println(StringUtil.timenow() + ":done DistributedGravity");
+	        System.out.println(StringUtil.timenow() + ":done DistributedGravity");
 
 	    }
 
