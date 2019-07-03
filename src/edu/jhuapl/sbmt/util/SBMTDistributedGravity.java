@@ -769,7 +769,12 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        URI gravityExe;
 	        try
             {
-                gravityExe = getFile(getJarURI(), "/misc/programs/gravity/macos/gravity");
+	        	URI jarURI = getJarURI();
+	        	String parentPath = new File(jarURI.getPath()).getParent() + File.separator + "near.jar";
+
+	        	URI updatedURI = new URI(jarURI.getScheme(), jarURI.getUserInfo(), jarURI.getHost(), jarURI.getPort(), parentPath.replace('\\', '/'), jarURI.getQuery(), jarURI.getFragment());
+
+                gravityExe = getFile(updatedURI, "/misc/programs/gravity/macos/gravity");
                 System.out.println(
                         "SBMTDistributedGravity: getGravityAtLocations: gravityExe " + gravityExe);
             }
@@ -1827,7 +1832,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	            return (uri);
 	        }
 
-	        private static URI getFile(final URI    where,
+	        public static URI getFile(final URI    where,
 	                                   final String fileName)
 	            throws ZipException,
 	                   IOException
