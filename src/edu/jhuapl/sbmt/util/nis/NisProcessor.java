@@ -18,7 +18,9 @@ import vtk.vtkPolyData;
 import vtk.vtkTriangle;
 
 import edu.jhuapl.saavtk.model.GenericPolyhedralModel;
+import edu.jhuapl.sbmt.client.ISmallBodyModel;
 import edu.jhuapl.sbmt.model.eros.NISSpectrum;
+import edu.jhuapl.sbmt.spectrum.model.rendering.BasicSpectrumRenderer;
 
 public class NisProcessor implements Runnable
 {
@@ -27,10 +29,12 @@ public class NisProcessor implements Runnable
     List<NisSample>[] faceSamples;
     vtkOBBTree tree;
     String directory;
+    ISmallBodyModel smallBodyModel;
 
-    public NisProcessor(NisDataSource data, String directory)
+    public NisProcessor(NisDataSource data, String directory, ISmallBodyModel model)
     {
         this.data=data;
+        this.smallBodyModel = model;
         faceSamples=new List[data.erosModel.getSmallBodyPolyData().GetNumberOfCells()];
         for (int i=0; i<faceSamples.length; i++)
             faceSamples[i]=Lists.newArrayList();
@@ -61,8 +65,9 @@ public class NisProcessor implements Runnable
         {
             NisTime time=timeIterator.next();
             NISSpectrum spectrum=data.getSpectrum(time);
-            spectrum.generateFootprint();
-            vtkPolyData footprint=spectrum.getUnshiftedFootprint();
+            BasicSpectrumRenderer spectrumRenderer = new BasicSpectrumRenderer(spectrum, smallBodyModel, false);
+            spectrumRenderer.generateFootprint();
+            vtkPolyData footprint=spectrumRenderer.getUnshiftedFootprint();
             //
             Vector3D toSun=data.getToSunVector(time).normalize();               // normalized
             Vector3D spacecraftPosition=new Vector3D(spectrum.getSpacecraftPosition());
