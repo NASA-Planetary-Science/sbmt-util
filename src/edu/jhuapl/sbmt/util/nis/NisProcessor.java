@@ -20,7 +20,7 @@ import vtk.vtkTriangle;
 import edu.jhuapl.saavtk.model.GenericPolyhedralModel;
 import edu.jhuapl.sbmt.client.ISmallBodyModel;
 import edu.jhuapl.sbmt.model.eros.NISSpectrum;
-import edu.jhuapl.sbmt.spectrum.model.rendering.BasicSpectrumRenderer;
+import edu.jhuapl.sbmt.spectrum.rendering.BasicSpectrumRenderer;
 
 public class NisProcessor implements Runnable
 {
