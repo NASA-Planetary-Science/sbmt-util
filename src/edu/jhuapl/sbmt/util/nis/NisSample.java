@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
-import edu.jhuapl.sbmt.model.eros.NIS;
+import edu.jhuapl.sbmt.model.eros.nis.NIS;
 
 public class NisSample
 {

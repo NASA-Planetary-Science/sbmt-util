@@ -24,7 +24,7 @@ import edu.jhuapl.sbmt.client.SbmtModelFactory;
 import edu.jhuapl.sbmt.client.SmallBodyModel;
 import edu.jhuapl.sbmt.client.SmallBodyViewConfig;
 import edu.jhuapl.sbmt.gui.eros.NISSearchPanel;
-import edu.jhuapl.sbmt.model.eros.NISSpectrum;
+import edu.jhuapl.sbmt.model.eros.nis.NISSpectrum;
 
 public class NisDataSource
 {

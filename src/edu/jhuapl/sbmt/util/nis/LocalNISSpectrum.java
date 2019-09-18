@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.IOException;
 
 import edu.jhuapl.sbmt.client.ISmallBodyModel;
-import edu.jhuapl.sbmt.model.eros.NIS;
-import edu.jhuapl.sbmt.model.eros.NISSpectrum;
+import edu.jhuapl.sbmt.model.eros.nis.NIS;
+import edu.jhuapl.sbmt.model.eros.nis.NISSpectrum;
 
 public class LocalNISSpectrum extends NISSpectrum
 {
