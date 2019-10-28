@@ -28,6 +28,7 @@ import edu.jhuapl.sbmt.client.SmallBodyModel;
 import edu.jhuapl.sbmt.client.SmallBodyViewConfig;
 import edu.jhuapl.sbmt.model.eros.nis.NISSpectrum;
 import edu.jhuapl.sbmt.spectrum.model.core.SpectrumInstrumentFactory;
+import edu.jhuapl.sbmt.spectrum.model.io.SpectrumInstrumentMetadataIO;
 import edu.jhuapl.sbmt.tools.Authenticator;
 
 public class NISInfoFileGenerator
@@ -73,7 +74,7 @@ public class NISInfoFileGenerator
 
 			System.out.println("NISInfoFileGenerator: NISInfoFileGenerator: spectrumFile " + spectrumFile.getAbsolutePath());
 
-			NISSpectrum spectrum = new NISSpectrum(spectrumFile.getAbsolutePath(), smallBodyModel, SpectrumInstrumentFactory.getInstrumentForName("NIS"));
+			NISSpectrum spectrum = new NISSpectrum(spectrumFile.getAbsolutePath(), (SpectrumInstrumentMetadataIO)smallBodyModel.getSmallBodyConfig().getHierarchicalSpectraSearchSpecification(), smallBodyModel, SpectrumInstrumentFactory.getInstrumentForName("NIS"));
 			spectrum.isCustomSpectra = true;
 			spectrum.readSpectrumFromFile();
 
