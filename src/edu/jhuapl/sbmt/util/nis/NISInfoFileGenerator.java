@@ -104,19 +104,19 @@ public class NISInfoFileGenerator
 			writer.newLine();
 			writer.write("STOP_TIME           = " + timeString);
 			writer.newLine();
-			writer.write("SPACECRAFT_POSITION = (" + spacecraftPosition[0] + " , " + spacecraftPosition[1] + " , " + spacecraftPosition[2] + " )");
+			writer.write("SPACECRAFT_POSITION = ( " + spacecraftPosition[0] + " , " + spacecraftPosition[1] + " , " + spacecraftPosition[2] + " )");
 			writer.newLine();
-			writer.write("BORESIGHT_DIRECTION = (" + frustumCenter[0] + " , " + frustumCenter[1] + " , " + frustumCenter[2] + " )");
+			writer.write("BORESIGHT_DIRECTION = ( " + frustumCenter[0] + " , " + frustumCenter[1] + " , " + frustumCenter[2] + " )");
 			writer.newLine();
-			writer.write("FRUSTUM1            = (" + frustum1[0] + " , " + frustum1[1] + " , " + frustum1[2] + " )");
+			writer.write("FRUSTUM1            = ( " + frustum1[0] + " , " + frustum1[1] + " , " + frustum1[2] + " )");
 			writer.newLine();
-			writer.write("FRUSTUM2            = (" + frustum2[0] + " , " + frustum2[1] + " , " + frustum2[2] + " )");
+			writer.write("FRUSTUM2            = ( " + frustum2[0] + " , " + frustum2[1] + " , " + frustum2[2] + " )");
 			writer.newLine();
-			writer.write("FRUSTUM3            = (" + frustum3[0] + " , " + frustum3[1] + " , " + frustum3[2] + " )");
+			writer.write("FRUSTUM3            = ( " + frustum3[0] + " , " + frustum3[1] + " , " + frustum3[2] + " )");
 			writer.newLine();
-			writer.write("FRUSTUM4            = (" + frustum4[0] + " , " + frustum4[1] + " , " + frustum4[2] + " )");
+			writer.write("FRUSTUM4            = ( " + frustum4[0] + " , " + frustum4[1] + " , " + frustum4[2] + " )");
 			writer.newLine();
-			writer.write("SUN_POSITION_LT     = (" + toSunUnitVector[0] + " , " + toSunUnitVector[1] + " , " + toSunUnitVector[2] + " )");
+			writer.write("SUN_POSITION_LT     = ( " + toSunUnitVector[0] + " , " + toSunUnitVector[1] + " , " + toSunUnitVector[2] + " )");
 			line = reader.readLine();
 			writer.flush();
 			writer.close();
@@ -139,7 +139,7 @@ public class NISInfoFileGenerator
 
         // basic default configuration, most of these will be overwritten by the configureMission() method
         Configuration.setAPLVersion(aplVersion);
-        Configuration.setRootURL("http://sbmt.jhuapl.edu/sbmt/prod/");
+        Configuration.setRootURL("http://sbmt.jhuapl.edu/sbmt/stage/");
 
         // authentication
         Authenticator.authenticate();
