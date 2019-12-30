@@ -30,7 +30,7 @@ public class HololensEros
 
     static
     {
-        NativeLibraryLoader.loadAllVtkLibraries();
+        NativeLibraryLoader.loadVtkLibraries();
         SmallBodyViewConfig.initialize();
     }
 
