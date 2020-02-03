@@ -10,7 +10,6 @@ import javax.imageio.ImageIO;
 import vtk.vtkCellDataToPointData;
 import vtk.vtkDoubleArray;
 import vtk.vtkFloatArray;
-import vtk.vtkNativeLibrary;
 import vtk.vtkPNGReader;
 import vtk.vtkPolyData;
 import vtk.vtkPolyDataWriter;
@@ -20,6 +19,7 @@ import edu.jhuapl.saavtk.colormap.Colormaps;
 import edu.jhuapl.saavtk.model.ColoringData;
 import edu.jhuapl.saavtk.model.ShapeModelBody;
 import edu.jhuapl.saavtk.model.ShapeModelType;
+import edu.jhuapl.saavtk.util.NativeLibraryLoader;
 import edu.jhuapl.saavtk.util.ObjUtil;
 import edu.jhuapl.sbmt.client.SbmtModelFactory;
 import edu.jhuapl.sbmt.client.SmallBodyModel;
@@ -30,7 +30,7 @@ public class HololensEros
 
     static
     {
-        vtkNativeLibrary.LoadAllNativeLibraries();
+        NativeLibraryLoader.loadVtkLibraries();
         SmallBodyViewConfig.initialize();
     }
 
