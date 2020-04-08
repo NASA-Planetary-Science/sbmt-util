@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
@@ -60,12 +61,12 @@ public class NisPhaseCurveHistogram extends RegularHistogram2D
             System.out.print("Processing "+filePath+"... ");
             NisSampleFile file=new NisSampleFile(filePath);
             Iterator<NisSample> iterator=file.iterator();
-            Stopwatch sw=new Stopwatch();
+            Stopwatch sw = Stopwatch.createUnstarted();
             sw.start();
             int cnt=0;
             while (iterator.hasNext())
             {
-                if (sw.elapsedMillis()>4000)
+                if (sw.elapsed(TimeUnit.MILLISECONDS)>4000)
                 {
                     System.out.println(" "+(cnt+1)+"/"+file.nSamples);
                     sw.reset();
