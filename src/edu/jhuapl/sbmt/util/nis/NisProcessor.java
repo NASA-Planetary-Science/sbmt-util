@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
@@ -59,7 +60,7 @@ public class NisProcessor implements Runnable
         int spectrumCount=0;
         Iterator<NisTime> timeIterator=data.getAllTimesInDirectory(directory).iterator();
         //
-        Stopwatch sw=new Stopwatch();
+        Stopwatch sw = Stopwatch.createUnstarted();
         sw.start();
         while (timeIterator.hasNext() && spectrumCount<spectraToProcess)
         {
@@ -75,7 +76,7 @@ public class NisProcessor implements Runnable
             double[] spectralIntensity=Arrays.copyOf(spectrum.getSpectrum(),spectrum.getSpectrum().length);
             for (int c=0; c<footprint.GetNumberOfCells(); c++)
             {
-                if (sw.elapsedMillis()>20000)
+                if (sw.elapsed(TimeUnit.MILLISECONDS)>20000)
                 {
                     System.out.println("Spectrum "+spectrumCount+"/"+spectraToProcess+"  Face "+(c+1)+"/"+footprint.GetNumberOfCells());
              //       printBins(360, Paths.get("/Users/zimmemi1/Desktop/test.dat"));
