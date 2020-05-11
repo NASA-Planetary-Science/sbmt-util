@@ -29,7 +29,6 @@ import edu.jhuapl.sbmt.client.SmallBodyViewConfig;
 import edu.jhuapl.sbmt.model.eros.nis.NISSpectrum;
 import edu.jhuapl.sbmt.spectrum.model.core.SpectrumInstrumentFactory;
 import edu.jhuapl.sbmt.spectrum.model.io.SpectrumInstrumentMetadataIO;
-import edu.jhuapl.sbmt.tools.Authenticator;
 
 public class NISInfoFileGenerator
 {
@@ -142,7 +141,7 @@ public class NISInfoFileGenerator
         Configuration.setRootURL("http://sbmt.jhuapl.edu/sbmt/stage/");
 
         // authentication
-        Authenticator.authenticate();
+        Configuration.authenticate();
 
         // initialize view config
         SmallBodyViewConfig.fromServer = false;
