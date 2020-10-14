@@ -64,7 +64,6 @@ public class HololensEros
         // is used again, there may be side-effects, but that should turn up in routine testing.
         int numberElements = erosModel.getSmallBodyPolyData().GetNumberOfCells();
         ColoringData coloringData = erosModel.getColoringDataManager().get(numberElements).get(coloringIndex);
-        coloringData.load();
         double[] coloringRange=coloringData.getDefaultRange();
         vtkDoubleArray values=new vtkDoubleArray();
         values.SetName("values");
