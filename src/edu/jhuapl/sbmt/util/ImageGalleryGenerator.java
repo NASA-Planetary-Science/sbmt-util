@@ -47,11 +47,11 @@ public class ImageGalleryGenerator
 
         // Copy over required javascript files
         ConvertResourceToFile.convertResourceToRealFile(
-                galleryURL,
+                galleryURL.getClass(),
                 "/edu/jhuapl/sbmt/data/main.js",
                 Configuration.getCustomGalleriesDir());
         ConvertResourceToFile.convertResourceToRealFile(
-                galleryURL,
+                galleryURL.getClass(),
                 "/edu/jhuapl/sbmt/data/jquery.js",
                 Configuration.getCustomGalleriesDir());
 
