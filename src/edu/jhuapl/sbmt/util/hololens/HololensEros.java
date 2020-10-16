@@ -16,9 +16,9 @@ import vtk.vtkPolyDataWriter;
 
 import edu.jhuapl.saavtk.colormap.Colormap;
 import edu.jhuapl.saavtk.colormap.Colormaps;
-import edu.jhuapl.saavtk.model.ColoringData;
 import edu.jhuapl.saavtk.model.ShapeModelBody;
 import edu.jhuapl.saavtk.model.ShapeModelType;
+import edu.jhuapl.saavtk.model.plateColoring.ColoringData;
 import edu.jhuapl.saavtk.util.NativeLibraryLoader;
 import edu.jhuapl.saavtk.util.ObjUtil;
 import edu.jhuapl.sbmt.client.SbmtModelFactory;
