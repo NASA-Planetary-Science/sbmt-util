@@ -69,7 +69,7 @@ public class HololensEros
         values.SetName("values");
         for (int i=0; i<numberElements; i++)
         {
-            double scaledValue=(coloringData.getData().GetTuple1(i)-coloringRange[0])/(coloringRange[1]-coloringRange[0]);
+            double scaledValue=(coloringData.getData().get(i).get(0)-coloringRange[0])/(coloringRange[1]-coloringRange[0]);
             if (scaledValue<0)
                 scaledValue=0;
             if (scaledValue>1)
