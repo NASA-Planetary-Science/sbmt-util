@@ -1,22 +1,30 @@
 package edu.jhuapl.sbmt.util;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import edu.jhuapl.saavtk.util.Configuration;
 import edu.jhuapl.saavtk.util.ConvertResourceToFile;
+import edu.jhuapl.saavtk.util.FileCache;
+import edu.jhuapl.saavtk.util.NonexistentRemoteFile;
+import edu.jhuapl.saavtk.util.SafeURLPaths;
+import edu.jhuapl.sbmt.model.image.IImagingInstrument;
 
-public class ImageGalleryGenerator
+public abstract class ImageGalleryGenerator
 {
     public static class ImageGalleryEntry
     {
-        private String caption;
-        private String imageFilename;
-        private String previewFilename;
+        private final String caption;
+        private final String imageFilename;
+        private final String previewFilename;
 
         public ImageGalleryEntry(String caption, String imageFilename, String previewFilename)
         {
@@ -26,7 +34,114 @@ public class ImageGalleryGenerator
         }
     }
 
+    protected static final SafeURLPaths SAFE_URL_PATHS = SafeURLPaths.instance();
+
+    public static ImageGalleryGenerator of(IImagingInstrument instrument)
+    {
+        String rootPath = instrument.getSearchQuery().getRootPath();
+        String galleryListFile = SAFE_URL_PATHS.getString(rootPath, "gallery-list.txt");
+
+        File file;
+        try
+        {
+            file = FileCache.getFileFromServer(galleryListFile);
+        }
+        catch (NonexistentRemoteFile e)
+        {
+            // Ignore this -- this file is a newer resource, not present
+            // in legacy models. It was added when DART models were added.
+            file = null;
+        }
+
+        String dataPath = instrument.getSearchQuery().getDataPath();
+        String galleryPath = instrument.getSearchQuery().getGalleryPath();
+
+        if (file == null || !file.isFile())
+        {
+            // Legacy behavior.
+            return new ImageGalleryGenerator() {
+
+                @Override
+                protected IImagingInstrument getInstrument()
+                {
+                    return instrument;
+                }
+
+                @Override
+                protected String getPreviewImageFile(String imageFileName)
+                {
+                    return "/" + imageFileName.replace(dataPath, galleryPath) + "-small.jpeg";
+                }
+
+                @Override
+                protected String getGalleryImageFile(String imageFileName)
+                {
+                    return "/" + imageFileName.replace(dataPath, galleryPath) + ".jpeg";
+                }
+            };
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file)))
+        {
+
+            LinkedHashMap<String, String> previewImages = new LinkedHashMap<>();
+            LinkedHashMap<String, String> galleryImages = new LinkedHashMap<>();
+
+            String line;
+            int lineNumber = 0;
+            while ((line = reader.readLine()) != null)
+            {
+                ++lineNumber;
+
+                String[] files = line.split("\\s+");
+
+                if (files.length != 3)
+                {
+                    throw new IOException("Expected three fields in gallery list file " + file + " on line " + lineNumber + ": " + line);
+                }
+
+                String imageFilePath = SAFE_URL_PATHS.getString(dataPath, files[0]);
+                previewImages.put(imageFilePath, SAFE_URL_PATHS.getString(galleryPath, files[1]));
+                galleryImages.put(imageFilePath, SAFE_URL_PATHS.getString(galleryPath, files[2]));
+            }
+
+            return new ImageGalleryGenerator() {
+
+                @Override
+                protected IImagingInstrument getInstrument()
+                {
+                    return instrument;
+                }
+
+                @Override
+                protected String getPreviewImageFile(String imageFileName)
+                {
+                    return previewImages.get(imageFileName);
+                }
+
+                @Override
+                protected String getGalleryImageFile(String imageFileName)
+                {
+                    return galleryImages.get(imageFileName);
+                }
+
+            };
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Unable to show gallery view", e);
+        }
+
+    }
+
+    protected ImageGalleryGenerator()
+    {
+        super();
+    }
+
     // Generates all the required image gallery files and returns the location of the HTML file
+    // This is static as a holdover from when this whole class was static; eventually it should be
+    // changed to non-static.
     public static String generateGallery(List<ImageGalleryEntry> entries)
     {
         // Define location and name of gallery file
@@ -58,6 +173,17 @@ public class ImageGalleryGenerator
         // Return to user to be opened
         return galleryURL;
     }
+
+    public ImageGalleryEntry getEntry(String imageFileName)
+    {
+        return new ImageGalleryEntry(imageFileName.substring(imageFileName.lastIndexOf("/") + 1), getGalleryImageFile(imageFileName), getPreviewImageFile(imageFileName));
+    }
+
+    protected abstract IImagingInstrument getInstrument();
+
+    protected abstract String getPreviewImageFile(String imageFileName);
+
+    protected abstract String getGalleryImageFile(String imageFileName);
 
     // Creates equivalent of gallery.html at specified location and containing entries in argument
     private static void generateGalleryHTML(String galleryURL, String galleryName, List<ImageGalleryEntry> entries) throws FileNotFoundException
