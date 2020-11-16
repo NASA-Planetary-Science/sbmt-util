@@ -10,12 +10,17 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+
+import com.jidesoft.utils.SwingWorker;
 
 import edu.jhuapl.saavtk.util.Configuration;
 import edu.jhuapl.saavtk.util.ConvertResourceToFile;
+import edu.jhuapl.saavtk.util.Debug;
 import edu.jhuapl.saavtk.util.FileCache;
 import edu.jhuapl.saavtk.util.NonexistentRemoteFile;
 import edu.jhuapl.saavtk.util.SafeURLPaths;
+import edu.jhuapl.saavtk.util.file.ZipFileUnzipper;
 import edu.jhuapl.sbmt.model.image.IImagingInstrument;
 
 public abstract class ImageGalleryGenerator
@@ -32,13 +37,27 @@ public abstract class ImageGalleryGenerator
             this.imageFilename = imageFilename;
             this.previewFilename = previewFilename;
         }
+
+        @Override
+        public String toString()
+        {
+            return caption + " (" + previewFilename + " -> " + imageFilename + ")";
+        }
     }
 
     protected static final SafeURLPaths SAFE_URL_PATHS = SafeURLPaths.instance();
 
     public static ImageGalleryGenerator of(IImagingInstrument instrument)
     {
+        if (instrument == null)
+        {
+            return null;
+        }
+
         String rootPath = instrument.getSearchQuery().getRootPath();
+
+        AtomicReference<String> galleryTopReference = new AtomicReference<>();
+
         String galleryListFile = SAFE_URL_PATHS.getString(rootPath, "gallery-list.txt");
 
         File file;
@@ -56,16 +75,11 @@ public abstract class ImageGalleryGenerator
         String dataPath = instrument.getSearchQuery().getDataPath();
         String galleryPath = instrument.getSearchQuery().getGalleryPath();
 
+        ImageGalleryGenerator nonFinalGenerator;
         if (file == null || !file.isFile())
         {
             // Legacy behavior.
-            return new ImageGalleryGenerator() {
-
-                @Override
-                protected IImagingInstrument getInstrument()
-                {
-                    return instrument;
-                }
+            nonFinalGenerator = new ImageGalleryGenerator() {
 
                 @Override
                 protected String getPreviewImageFile(String imageFileName)
@@ -78,61 +92,132 @@ public abstract class ImageGalleryGenerator
                 {
                     return "/" + imageFileName.replace(dataPath, galleryPath) + ".jpeg";
                 }
-            };
-        }
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(file)))
-        {
-
-            LinkedHashMap<String, String> previewImages = new LinkedHashMap<>();
-            LinkedHashMap<String, String> galleryImages = new LinkedHashMap<>();
-
-            String line;
-            int lineNumber = 0;
-            while ((line = reader.readLine()) != null)
-            {
-                ++lineNumber;
-
-                String[] files = line.split("\\s+");
-
-                if (files.length != 3)
+                @Override
+                protected String getPreviewTopUrl()
                 {
-                    throw new IOException("Expected three fields in gallery list file " + file + " on line " + lineNumber + ": " + line);
+                    galleryTopReference.compareAndSet(null, Configuration.getDataRootURL().toString());
+
+                    return galleryTopReference.get();
                 }
 
-                String imageFilePath = SAFE_URL_PATHS.getString(dataPath, files[0]);
-                previewImages.put(imageFilePath, SAFE_URL_PATHS.getString(galleryPath, files[1]));
-                galleryImages.put(imageFilePath, SAFE_URL_PATHS.getString(galleryPath, files[2]));
+                @Override
+                protected void setPreviewTopUrl(String previewTopUrl)
+                {
+                    galleryTopReference.set(previewTopUrl != null ? previewTopUrl : Configuration.getDataRootURL().toString());
+                }
+            };
+        }
+        else
+        {
+            try (BufferedReader reader = new BufferedReader(new FileReader(file)))
+            {
+
+                LinkedHashMap<String, String> previewImages = new LinkedHashMap<>();
+                LinkedHashMap<String, String> galleryImages = new LinkedHashMap<>();
+
+                String line;
+                int lineNumber = 0;
+                while ((line = reader.readLine()) != null)
+                {
+                    ++lineNumber;
+
+                    String[] files = line.split("\\s+");
+
+                    if (files.length != 3)
+                    {
+                        throw new IOException("Expected three fields in gallery list file " + file + " on line " + lineNumber + ": " + line);
+                    }
+
+                    String imageFilePath = SAFE_URL_PATHS.getString(dataPath, files[0]);
+                    previewImages.put(imageFilePath, SAFE_URL_PATHS.getString(galleryPath, files[1]));
+                    galleryImages.put(imageFilePath, SAFE_URL_PATHS.getString(galleryPath, files[2]));
+                }
+
+                nonFinalGenerator = new ImageGalleryGenerator() {
+
+                    @Override
+                    protected String getPreviewImageFile(String imageFileName)
+                    {
+                        return previewImages.get(imageFileName);
+                    }
+
+                    @Override
+                    protected String getGalleryImageFile(String imageFileName)
+                    {
+                        return galleryImages.get(imageFileName);
+                    }
+
+                    @Override
+                    protected String getPreviewTopUrl()
+                    {
+                        galleryTopReference.compareAndSet(null, Configuration.getDataRootURL().toString());
+
+                        return galleryTopReference.get();
+                    }
+
+                    @Override
+                    protected void setPreviewTopUrl(String previewTopUrl)
+                    {
+                        galleryTopReference.set(previewTopUrl != null ? previewTopUrl : Configuration.getDataRootURL().toString());
+                    }
+
+                };
+            }
+            catch (IOException e)
+            {
+                throw new RuntimeException("Unable to show gallery view", e);
             }
 
-            return new ImageGalleryGenerator() {
+        }
+
+        ImageGalleryGenerator galleryGenerator = nonFinalGenerator;
+
+        String galleryZipFile = SAFE_URL_PATHS.getString(rootPath, "gallery.zip");
+        if (!FileCache.instance().getFile(galleryZipFile).isFile())
+        {
+            SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 
                 @Override
-                protected IImagingInstrument getInstrument()
+                protected Void doInBackground() throws Exception
                 {
-                    return instrument;
-                }
-
-                @Override
-                protected String getPreviewImageFile(String imageFileName)
-                {
-                    return previewImages.get(imageFileName);
-                }
-
-                @Override
-                protected String getGalleryImageFile(String imageFileName)
-                {
-                    return galleryImages.get(imageFileName);
+                    File zipFile = null;
+                    try
+                    {
+                        System.err.println("Trying to download and unzip again the file " + galleryZipFile);
+                        zipFile = FileCache.getFileFromServer(galleryZipFile);
+                        if (zipFile.isFile())
+                        {
+                            ZipFileUnzipper unzipper = ZipFileUnzipper.of(zipFile);
+                            unzipper.unzip();
+                            galleryGenerator.setPreviewTopUrl(".");
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        // Ignore this -- this file is a newer resource, not present
+                        // in legacy models. It was added when DART models were
+                        // added.
+                        if (zipFile != null && !Debug.isEnabled())
+                        {
+                            zipFile.delete();
+                        }
+                    }
+                    return null;
                 }
 
             };
+            worker.execute();
         }
-        catch (IOException e)
+        else
         {
-            throw new RuntimeException("Unable to show gallery view", e);
+            // The gallery zip file exists -- assume it was unzipped in the cache already.
+            galleryGenerator.setPreviewTopUrl(".");
         }
 
-    }
+
+        return galleryGenerator;
+  }
 
     protected ImageGalleryGenerator()
     {
@@ -140,12 +225,39 @@ public abstract class ImageGalleryGenerator
     }
 
     // Generates all the required image gallery files and returns the location of the HTML file
-    // This is static as a holdover from when this whole class was static; eventually it should be
-    // changed to non-static.
-    public static String generateGallery(List<ImageGalleryEntry> entries)
+    public String generateGallery(List<ImageGalleryEntry> entries)
     {
         // Define location and name of gallery file
-        String galleryURL = Configuration.getCustomGalleriesDir() + File.separator + "gallery.html";
+        String galleryURL = SAFE_URL_PATHS.getString(Configuration.getCacheDir(), "gallery.html");
+
+//        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+//
+//            @Override
+//            protected Void doInBackground() throws Exception
+//            {
+//                for (ImageGalleryEntry entry : entries) {
+//                    try
+//                    {
+//                        FileCache.getFileFromServer(entry.previewFilename);
+//                    }
+//                    catch (Exception e)
+//                    {
+//
+//                    }
+//                    try
+//                    {
+//                        FileCache.getFileFromServer(entry.imageFilename);
+//                    }
+//                    catch (Exception e)
+//                    {
+//
+//                    }
+//                }
+//                return null;
+//            }
+//
+//        };
+//        worker.execute();
 
         // Generate the image gallery
         try
@@ -176,17 +288,27 @@ public abstract class ImageGalleryGenerator
 
     public ImageGalleryEntry getEntry(String imageFileName)
     {
-        return new ImageGalleryEntry(imageFileName.substring(imageFileName.lastIndexOf("/") + 1), getGalleryImageFile(imageFileName), getPreviewImageFile(imageFileName));
-    }
+        String imageFileUrl = locateGalleryFile(getGalleryImageFile(imageFileName));
+        String previewFileUrl = locateGalleryFile(getPreviewImageFile(imageFileName));
 
-    protected abstract IImagingInstrument getInstrument();
+        return new ImageGalleryEntry(imageFileName.substring(imageFileName.lastIndexOf("/") + 1), imageFileUrl, previewFileUrl);
+    }
 
     protected abstract String getPreviewImageFile(String imageFileName);
 
     protected abstract String getGalleryImageFile(String imageFileName);
 
+    protected abstract String getPreviewTopUrl();
+
+    protected abstract void setPreviewTopUrl(String previewToUrl);
+
+    protected String locateGalleryFile(String fileName)
+    {
+        return SAFE_URL_PATHS.getString(getPreviewTopUrl(), fileName);
+    }
+
     // Creates equivalent of gallery.html at specified location and containing entries in argument
-    private static void generateGalleryHTML(String galleryURL, String galleryName, List<ImageGalleryEntry> entries) throws FileNotFoundException
+    private void generateGalleryHTML(String galleryURL, String galleryName, List<ImageGalleryEntry> entries) throws FileNotFoundException
     {
         // Setup writer
         PrintWriter writer = new PrintWriter(galleryURL);
@@ -270,13 +392,14 @@ public abstract class ImageGalleryGenerator
         writer.println("<body>");
         writer.println("<h1>" + galleryName + "</h1>");
         writer.println("<ul>");
+
         for(ImageGalleryEntry entry : entries)
         {
             writer.println("<li><a href=\"" +
-                Configuration.getDataRootURL() + entry.imageFilename +
+                entry.imageFilename +
                 "\" class=\"preview\" title=\"" + entry.caption + "\"><img src=\"" +
-                Configuration.getDataRootURL() + entry.previewFilename +
-                "\" alt=\"gallery thumbnail\" /></a></li>");
+                entry.previewFilename +
+                "\" alt=\"" + entry.caption + "\" /></a></li>");
         }
         writer.println("</ul>");
         writer.println("</body>");
