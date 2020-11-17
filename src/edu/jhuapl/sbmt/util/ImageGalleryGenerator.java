@@ -184,7 +184,6 @@ public abstract class ImageGalleryGenerator
                     File zipFile = null;
                     try
                     {
-                        System.err.println("Trying to download and unzip again the file " + galleryZipFile);
                         zipFile = FileCache.getFileFromServer(galleryZipFile);
                         if (zipFile.isFile())
                         {
