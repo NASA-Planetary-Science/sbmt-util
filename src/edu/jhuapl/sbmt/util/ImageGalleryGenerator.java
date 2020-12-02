@@ -55,6 +55,12 @@ public abstract class ImageGalleryGenerator
         }
 
         String galleryPath = instrument.getSearchQuery().getGalleryPath();
+
+        if (galleryPath == null)
+        {
+            return null;
+        }
+
         String galleryParent = galleryPath.replaceFirst("[/\\\\]+[^/\\\\]+$", "");
 
         AtomicReference<String> galleryTopReference = new AtomicReference<>();
