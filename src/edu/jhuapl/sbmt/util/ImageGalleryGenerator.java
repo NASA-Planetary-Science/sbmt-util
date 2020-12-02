@@ -54,11 +54,12 @@ public abstract class ImageGalleryGenerator
             return null;
         }
 
-        String rootPath = instrument.getSearchQuery().getRootPath();
+        String galleryPath = instrument.getSearchQuery().getGalleryPath();
+        String galleryParent = galleryPath.replaceFirst("[/\\\\]+[^/\\\\]+$", "");
 
         AtomicReference<String> galleryTopReference = new AtomicReference<>();
 
-        String galleryListFile = SAFE_URL_PATHS.getString(rootPath, "gallery-list.txt");
+        String galleryListFile = SAFE_URL_PATHS.getString(galleryParent, "gallery-list.txt");
 
         File file;
         try
@@ -73,7 +74,6 @@ public abstract class ImageGalleryGenerator
         }
 
         String dataPath = instrument.getSearchQuery().getDataPath();
-        String galleryPath = instrument.getSearchQuery().getGalleryPath();
 
         ImageGalleryGenerator nonFinalGenerator;
         if (file == null || !file.isFile())
@@ -173,7 +173,7 @@ public abstract class ImageGalleryGenerator
 
         ImageGalleryGenerator galleryGenerator = nonFinalGenerator;
 
-        String galleryZipFile = SAFE_URL_PATHS.getString(rootPath, "gallery.zip");
+        String galleryZipFile = SAFE_URL_PATHS.getString(galleryParent, "gallery.zip");
         if (!FileCache.instance().getFile(galleryZipFile).isFile())
         {
             SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
