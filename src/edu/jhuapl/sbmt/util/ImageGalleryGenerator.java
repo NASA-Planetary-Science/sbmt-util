@@ -20,7 +20,6 @@ import edu.jhuapl.saavtk.util.Debug;
 import edu.jhuapl.saavtk.util.FileCache;
 import edu.jhuapl.saavtk.util.NonexistentRemoteFile;
 import edu.jhuapl.saavtk.util.SafeURLPaths;
-import edu.jhuapl.saavtk.util.file.ZipFileUnzipper;
 import edu.jhuapl.sbmt.model.image.IImagingInstrument;
 
 public abstract class ImageGalleryGenerator
@@ -191,12 +190,7 @@ public abstract class ImageGalleryGenerator
                     try
                     {
                         zipFile = FileCache.getFileFromServer(galleryZipFile);
-                        if (zipFile.isFile())
-                        {
-                            ZipFileUnzipper unzipper = ZipFileUnzipper.of(zipFile);
-                            unzipper.unzip();
-                            galleryGenerator.setPreviewTopUrl(".");
-                        }
+                        galleryGenerator.setPreviewTopUrl(".");
                     }
                     catch (Exception e)
                     {
