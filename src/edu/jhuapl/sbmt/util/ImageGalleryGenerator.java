@@ -8,8 +8,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.jidesoft.utils.SwingWorker;
@@ -20,10 +22,41 @@ import edu.jhuapl.saavtk.util.Debug;
 import edu.jhuapl.saavtk.util.FileCache;
 import edu.jhuapl.saavtk.util.NonexistentRemoteFile;
 import edu.jhuapl.saavtk.util.SafeURLPaths;
+import edu.jhuapl.sbmt.gui.image.controllers.images.ImageResultsTableController;
 import edu.jhuapl.sbmt.model.image.IImagingInstrument;
+import edu.jhuapl.sbmt.query.IQueryBase;
 
+/**
+ * Class that manages access to image galleries via a local HTML file plus
+ * cached images. It is something of a compromise to offer a couple options for
+ * how to manage downloads within the legacy implementations of
+ * {@link IImagingIntrument}, {@link IQueryBase}, and most of all
+ * {@link ImageResultsTableController}.
+ * <p>
+ * The compromise is needed because the factory method
+ * {@link ImageGalleryGenerator#of(IImagingInstrument)} may be called multiple
+ * times for what turns out to be a single gallery path (for example, if
+ * multiple models access the same images). In order to avoid race conditions
+ * and duplicate downloads, this class keeps a map of its instances and returns
+ * only one for each gallery path, rather than instantiating repeatedly.
+ * <p>
+ * This class would ideally be package-private and final, so treat it as if it
+ * were. It is the way it is because of the compromise described above. It is
+ * not deprecated, but its use should not be expanded. It can't be private
+ * because the nested {@link ImageGalleryEntry} class is public. It can't be
+ * final because it was designed to have two distinct implementations before the
+ * problem was detected that led to the compromise.
+ *
+ * @author James Peachey
+ *
+ */
 public abstract class ImageGalleryGenerator
 {
+    /**
+     * Only construct one instance per gallery.
+     */
+    private static final Map<String, ImageGalleryGenerator> GalleryMap = new HashMap<>();
+
     public static class ImageGalleryEntry
     {
         private final String caption;
@@ -46,18 +79,40 @@ public abstract class ImageGalleryGenerator
 
     protected static final SafeURLPaths SAFE_URL_PATHS = SafeURLPaths.instance();
 
-    public static ImageGalleryGenerator of(IImagingInstrument instrument)
+    /**
+     * Return a valid generator for the given instrument, or null if the
+     * specified instrument does not have a gallery. The associated gallery is
+     * obtained from the {@link IQueryBase#getGalleryPath()} method for the
+     * query object returned by the specified instrument's
+     * {@link IImagingInstrument#getSearchQuery()} method.
+     *
+     * @param instrument the instrument for which to find the gallery
+     * @return a generator for the instrument's gallery, or null if there is no
+     *         gallery for this instrument.
+     */
+    public static synchronized ImageGalleryGenerator of(IImagingInstrument instrument)
     {
         if (instrument == null)
         {
             return null;
         }
 
-        String galleryPath = instrument.getSearchQuery().getGalleryPath();
+        // Make this final to prevent accidentally changing it before using it
+        // to add a map entry.
+        final String galleryPath = instrument.getSearchQuery().getGalleryPath();
 
         if (galleryPath == null)
         {
             return null;
+        }
+
+        ImageGalleryGenerator nonFinalGenerator = GalleryMap.get(galleryPath);
+
+        if (nonFinalGenerator != null)
+        {
+            // There is already a generator set up for this gallery, so just
+            // return it.
+            return nonFinalGenerator;
         }
 
         String galleryParent = galleryPath.replaceFirst("[/\\\\]+[^/\\\\]+$", "");
@@ -80,7 +135,6 @@ public abstract class ImageGalleryGenerator
 
         String dataPath = instrument.getSearchQuery().getDataPath();
 
-        ImageGalleryGenerator nonFinalGenerator;
         if (file == null || !file.isFile())
         {
             // Legacy behavior.
@@ -215,10 +269,16 @@ public abstract class ImageGalleryGenerator
             galleryGenerator.setPreviewTopUrl(".");
         }
 
+        GalleryMap.put(galleryPath, galleryGenerator);
+
         return galleryGenerator;
     }
 
-    protected ImageGalleryGenerator()
+    /**
+     * This constructor is private so that this class completely controls
+     * instantiation.
+     */
+    private ImageGalleryGenerator()
     {
         super();
     }
