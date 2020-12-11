@@ -233,41 +233,32 @@ public abstract class ImageGalleryGenerator
         ImageGalleryGenerator galleryGenerator = nonFinalGenerator;
 
         String galleryZipFile = SAFE_URL_PATHS.getString(galleryParent, "gallery.zip");
-        if (!FileCache.instance().getFile(galleryZipFile).isFile())
-        {
-            SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 
-                @Override
-                protected Void doInBackground() throws Exception
+            @Override
+            protected Void doInBackground() throws Exception
+            {
+                File zipFile = null;
+                try
                 {
-                    File zipFile = null;
-                    try
-                    {
-                        zipFile = FileCache.getFileFromServer(galleryZipFile);
-                        galleryGenerator.setPreviewTopUrl(".");
-                    }
-                    catch (Exception e)
-                    {
-                        // Ignore this -- this file is a newer resource, not
-                        // present in legacy models. It was added when DART
-                        // models were added.
-                        if (zipFile != null && !Debug.isEnabled())
-                        {
-                            zipFile.delete();
-                        }
-                    }
-                    return null;
+                    zipFile = FileCache.getFileFromServer(galleryZipFile);
+                    galleryGenerator.setPreviewTopUrl(".");
                 }
+                catch (Exception e)
+                {
+                    // Ignore this -- this file is a newer resource, not
+                    // present in legacy models. It was added when DART
+                    // models were added.
+                    if (zipFile != null && !Debug.isEnabled())
+                    {
+                        zipFile.delete();
+                    }
+                }
+                return null;
+            }
 
-            };
-            worker.execute();
-        }
-        else
-        {
-            // The gallery zip file exists -- assume it was unzipped in the
-            // cache already.
-            galleryGenerator.setPreviewTopUrl(".");
-        }
+        };
+        worker.execute();
 
         GalleryMap.put(galleryPath, galleryGenerator);
 
