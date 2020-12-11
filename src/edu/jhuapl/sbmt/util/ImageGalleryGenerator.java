@@ -200,9 +200,9 @@ public abstract class ImageGalleryGenerator
                     }
                     catch (Exception e)
                     {
-                        // Ignore this -- this file is a newer resource, not present
-                        // in legacy models. It was added when DART models were
-                        // added.
+                        // Ignore this -- this file is a newer resource, not
+                        // present in legacy models. It was added when DART
+                        // models were added.
                         if (zipFile != null && !Debug.isEnabled())
                         {
                             zipFile.delete();
@@ -216,20 +216,21 @@ public abstract class ImageGalleryGenerator
         }
         else
         {
-            // The gallery zip file exists -- assume it was unzipped in the cache already.
+            // The gallery zip file exists -- assume it was unzipped in the
+            // cache already.
             galleryGenerator.setPreviewTopUrl(".");
         }
 
-
         return galleryGenerator;
-  }
+    }
 
     protected ImageGalleryGenerator()
     {
         super();
     }
 
-    // Generates all the required image gallery files and returns the location of the HTML file
+    // Generates all the required image gallery files and returns the location
+    // of the HTML file
     public String generateGallery(List<ImageGalleryEntry> entries)
     {
         // Define location and name of gallery file
@@ -268,23 +269,23 @@ public abstract class ImageGalleryGenerator
         try
         {
             String galleryName = "Search Results Image Gallery (Auto-Generated on " +
-                new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()) + ")";
-            generateGalleryHTML(galleryURL,galleryName,entries);
+                    new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()) + ")";
+            generateGalleryHTML(galleryURL, galleryName, entries);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             System.err.println(e);
             return null;
         }
 
         // Copy over required javascript files
-        ConvertResourceToFile.convertResourceToRealFile(
-                galleryURL,
-                "/edu/jhuapl/sbmt/data/main.js",
+        ConvertResourceToFile.convertResourceToRealFile( //
+                galleryURL, //
+                "/edu/jhuapl/sbmt/data/main.js", //
                 Configuration.getCustomGalleriesDir());
-        ConvertResourceToFile.convertResourceToRealFile(
-                galleryURL,
-                "/edu/jhuapl/sbmt/data/jquery.js",
+        ConvertResourceToFile.convertResourceToRealFile( //
+                galleryURL, //
+                "/edu/jhuapl/sbmt/data/jquery.js", //
                 Configuration.getCustomGalleriesDir());
 
         // Return to user to be opened
@@ -312,7 +313,8 @@ public abstract class ImageGalleryGenerator
         return SAFE_URL_PATHS.getString(getPreviewTopUrl(), fileName);
     }
 
-    // Creates equivalent of gallery.html at specified location and containing entries in argument
+    // Creates equivalent of gallery.html at specified location and containing
+    // entries in argument
     private void generateGalleryHTML(String galleryURL, String galleryName, List<ImageGalleryEntry> entries) throws FileNotFoundException
     {
         // Setup writer
@@ -398,13 +400,13 @@ public abstract class ImageGalleryGenerator
         writer.println("<h1>" + galleryName + "</h1>");
         writer.println("<ul>");
 
-        for(ImageGalleryEntry entry : entries)
+        for (ImageGalleryEntry entry : entries)
         {
             writer.println("<li><a href=\"" +
-                entry.imageFilename +
-                "\" class=\"preview\" title=\"" + entry.caption + "\"><img src=\"" +
-                entry.previewFilename +
-                "\" alt=\"" + entry.caption + "\" /></a></li>");
+                    entry.imageFilename +
+                    "\" class=\"preview\" title=\"" + entry.caption + "\"><img src=\"" +
+                    entry.previewFilename +
+                    "\" alt=\"" + entry.caption + "\" /></a></li>");
         }
         writer.println("</ul>");
         writer.println("</body>");
