@@ -138,7 +138,7 @@ public class NISInfoFileGenerator
 
         // basic default configuration, most of these will be overwritten by the configureMission() method
         Configuration.setAPLVersion(aplVersion);
-        Configuration.setRootURL("http://sbmt.jhuapl.edu/sbmt/stage/");
+        Configuration.setRootURL("https://sbmt.jhuapl.edu/sbmt/stage/");
 
         // authentication
         Configuration.authenticate();
