@@ -339,7 +339,7 @@ public abstract class ImageGalleryGenerator
 
     public ImageGalleryEntry getEntry(String imageFileName)
     {
-        String imageFileUrl = locateGalleryFile(getGalleryImageFile(imageFileName));
+        String imageFileUrl = SAFE_URL_PATHS.getString(Configuration.getDataRootURL().toString(), getGalleryImageFile(imageFileName));
         String previewFileUrl = locateGalleryFile(getPreviewImageFile(imageFileName));
 
         return new ImageGalleryEntry(imageFileName.substring(imageFileName.lastIndexOf("/") + 1), imageFileUrl, previewFileUrl);
