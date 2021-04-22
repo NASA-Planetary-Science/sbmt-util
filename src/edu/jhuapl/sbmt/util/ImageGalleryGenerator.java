@@ -20,7 +20,7 @@ import edu.jhuapl.saavtk.util.Configuration;
 import edu.jhuapl.saavtk.util.ConvertResourceToFile;
 import edu.jhuapl.saavtk.util.Debug;
 import edu.jhuapl.saavtk.util.FileCache;
-import edu.jhuapl.saavtk.util.NonexistentRemoteFile;
+import edu.jhuapl.saavtk.util.NoInternetAccessException;
 import edu.jhuapl.saavtk.util.SafeURLPaths;
 import edu.jhuapl.sbmt.gui.image.controllers.images.ImageResultsTableController;
 import edu.jhuapl.sbmt.model.image.IImagingInstrument;
@@ -85,6 +85,14 @@ public abstract class ImageGalleryGenerator
      * obtained from the {@link IQueryBase#getGalleryPath()} method for the
      * query object returned by the specified instrument's
      * {@link IImagingInstrument#getSearchQuery()} method.
+     * <p>
+     * Successfully-initialized instances of {@link ImageGalleryGenerator} for a
+     * specific instrument are cached and looked up based on the gallery path
+     * (if a gallery path is non-null). If this method encounters an exception
+     * while trying to initialize an instanct for the given instrument, it will
+     * return null, but subsequent calls will keep attempting to set up the
+     * gallery. This is in case a transient problem is responsible for the
+     * exception.
      *
      * @param instrument the instrument for which to find the gallery
      * @return a generator for the instrument's gallery, or null if there is no
@@ -126,7 +134,11 @@ public abstract class ImageGalleryGenerator
         {
             file = FileCache.getFileFromServer(galleryListFile);
         }
-        catch (NonexistentRemoteFile e)
+        catch (NoInternetAccessException e)
+        {
+            return null;
+        }
+        catch (Exception e)
         {
             // Ignore this -- this file is a newer resource, not present
             // in legacy models. It was added when DART models were added.
@@ -223,9 +235,12 @@ public abstract class ImageGalleryGenerator
 
                 };
             }
-            catch (IOException e)
+            catch (Exception e)
             {
-                throw new RuntimeException("Unable to show gallery view", e);
+                // This is probably already true; adding explicit "set" here for
+                // completeness and to future-proof in case the code above
+                // changes.
+                nonFinalGenerator = null;
             }
 
         }
