@@ -129,7 +129,7 @@ public class MapMakerRemote
 
         String arguments = constructUrlArguments(args);
 //        System.out.println("MapMakerRemote: runMapmaker: doing query; outputdirectory " + outputFolder);
-        doQuery("http://sbmt.jhuapl.edu/admin/joshtest/index01.php", arguments);
+        doQuery("https://sbmt.jhuapl.edu/admin/joshtest/index01.php", arguments);
 
         if (n == 1 && !remoteSwingWorker.isCancelled())
         {
