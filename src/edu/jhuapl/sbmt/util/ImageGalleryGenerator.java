@@ -18,13 +18,26 @@ import edu.jhuapl.saavtk.util.Configuration;
 import edu.jhuapl.saavtk.util.ConvertResourceToFile;
 import edu.jhuapl.saavtk.util.Debug;
 import edu.jhuapl.saavtk.util.FileCache;
-import edu.jhuapl.saavtk.util.NonexistentRemoteFile;
 import edu.jhuapl.saavtk.util.SafeURLPaths;
 import edu.jhuapl.saavtk.util.file.ZipFileUnzipper;
 import edu.jhuapl.sbmt.model.image.IImagingInstrument;
+import edu.jhuapl.sbmt.query.IQueryBase;
 
+/**
+ * Class for managing access to image galleries. A gallery is a collection of
+ * reduced images that may be used to browse image search results quickly in a
+ * browser using a web page that is generated on-the-fly for each collection of
+ * search results.
+ *
+ * @author Philip Twu, overhauled and augmented by James Peachey in 2021
+ *
+ */
 public abstract class ImageGalleryGenerator
 {
+    /**
+     * A single gallery entry associated with a gallery image, a
+     * preview/thumbnail image, and a caption
+     */
     public static class ImageGalleryEntry
     {
         private final String caption;
@@ -47,6 +60,31 @@ public abstract class ImageGalleryGenerator
 
     protected static final SafeURLPaths SAFE_URL_PATHS = SafeURLPaths.instance();
 
+    /**
+     * Create an {@link ImageGalleryGenerator} for the specified
+     * {@link IImagingInstrument}, or null if a gallery generator cannot be set
+     * up for the instrument. This can happen if the instrument does not include
+     * a gallery (returning null for the path to the gallery), or if an
+     * exception prevents the gallery from being set up completely.
+     * <p>
+     * This method attempts to download an optional file named
+     * "gallery-list.txt", which, if present, is expected to be a 3 column CSV
+     * file associating the name of each image with the name of the preview
+     * (thumbnail) image and finally the name of the gallery image. In the
+     * absence of such a file, the gallery generator assumes the preview image
+     * has the base name from the (full-size) image file but with the suffix
+     * "-small.jpeg". Similarly, the gallery image is assumed to have an
+     * identical basename but extension .jpeg.
+     * <p>
+     * The code also tries to download and unpack an optional file named
+     * "gallery.zip", which, if present, is expected to contain the preview
+     * thumbnail images (but not the gallery images themselves). This is so that
+     * all proprietary thumbnail images may be unpacked in bulk prior to
+     * actually displaying the gallery in the web browser.
+     *
+     * @param instrument the instrument
+     * @return the gallery generator
+     */
     public static ImageGalleryGenerator of(IImagingInstrument instrument)
     {
         if (instrument == null)
@@ -54,7 +92,14 @@ public abstract class ImageGalleryGenerator
             return null;
         }
 
-        String galleryPath = instrument.getSearchQuery().getGalleryPath();
+        IQueryBase query = instrument.getSearchQuery();
+
+        if (query == null)
+        {
+            return null;
+        }
+
+        String galleryPath = query.getGalleryPath();
 
         if (galleryPath == null)
         {
@@ -72,14 +117,14 @@ public abstract class ImageGalleryGenerator
         {
             file = FileCache.getFileFromServer(galleryListFile);
         }
-        catch (NonexistentRemoteFile e)
+        catch (Exception e)
         {
             // Ignore this -- this file is a newer resource, not present
             // in legacy models. It was added when DART models were added.
             file = null;
         }
 
-        String dataPath = instrument.getSearchQuery().getDataPath();
+        String dataPath = query.getDataPath();
 
         ImageGalleryGenerator nonFinalGenerator;
         if (file == null || !file.isFile())
@@ -116,6 +161,8 @@ public abstract class ImageGalleryGenerator
         }
         else
         {
+            // Read the gallery-list.txt to associate each image with its
+            // thumbnail and gallery image.
             try (BufferedReader reader = new BufferedReader(new FileReader(file)))
             {
 
@@ -170,15 +217,19 @@ public abstract class ImageGalleryGenerator
 
                 };
             }
-            catch (IOException e)
+            catch (Exception e)
             {
-                throw new RuntimeException("Unable to show gallery view", e);
+                System.err.println(e);
+                return null;
             }
 
         }
 
         ImageGalleryGenerator galleryGenerator = nonFinalGenerator;
 
+        // Next try to download and unzip the file that contains all the
+        // preview/thumbnail images. This may take a while, so kick off a
+        // background thread to do this.
         String galleryZipFile = SAFE_URL_PATHS.getString(galleryParent, "gallery.zip");
         if (!FileCache.instance().getFile(galleryZipFile).isFile())
         {
@@ -200,9 +251,9 @@ public abstract class ImageGalleryGenerator
                     }
                     catch (Exception e)
                     {
-                        // Ignore this -- this file is a newer resource, not present
-                        // in legacy models. It was added when DART models were
-                        // added.
+                        // Ignore this -- this file is a newer resource, not
+                        // present in legacy models. It was added when DART
+                        // simulated models were added.
                         if (zipFile != null && !Debug.isEnabled())
                         {
                             zipFile.delete();
@@ -216,20 +267,21 @@ public abstract class ImageGalleryGenerator
         }
         else
         {
-            // The gallery zip file exists -- assume it was unzipped in the cache already.
+            // The gallery zip file exists -- assume it was unzipped in the
+            // cache already.
             galleryGenerator.setPreviewTopUrl(".");
         }
 
-
         return galleryGenerator;
-  }
+    }
 
     protected ImageGalleryGenerator()
     {
         super();
     }
 
-    // Generates all the required image gallery files and returns the location of the HTML file
+    // Generates all the required image gallery files and returns the location
+    // of the HTML file
     public String generateGallery(List<ImageGalleryEntry> entries)
     {
         // Define location and name of gallery file
@@ -268,24 +320,18 @@ public abstract class ImageGalleryGenerator
         try
         {
             String galleryName = "Search Results Image Gallery (Auto-Generated on " +
-                new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()) + ")";
-            generateGalleryHTML(galleryURL,galleryName,entries);
+                    new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()) + ")";
+            generateGalleryHTML(galleryURL, galleryName, entries);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             System.err.println(e);
             return null;
         }
 
         // Copy over required javascript files
-        ConvertResourceToFile.convertResourceToRealFile(
-                galleryURL,
-                "/edu/jhuapl/sbmt/data/main.js",
-                Configuration.getCustomGalleriesDir());
-        ConvertResourceToFile.convertResourceToRealFile(
-                galleryURL,
-                "/edu/jhuapl/sbmt/data/jquery.js",
-                Configuration.getCustomGalleriesDir());
+        ConvertResourceToFile.convertResourceToRealFile(galleryURL, "/edu/jhuapl/sbmt/data/main.js", Configuration.getCustomGalleriesDir());
+        ConvertResourceToFile.convertResourceToRealFile(galleryURL, "/edu/jhuapl/sbmt/data/jquery.js", Configuration.getCustomGalleriesDir());
 
         // Return to user to be opened
         return galleryURL;
@@ -312,7 +358,8 @@ public abstract class ImageGalleryGenerator
         return SAFE_URL_PATHS.getString(getPreviewTopUrl(), fileName);
     }
 
-    // Creates equivalent of gallery.html at specified location and containing entries in argument
+    // Creates equivalent of gallery.html at specified location and containing
+    // entries in argument
     private void generateGalleryHTML(String galleryURL, String galleryName, List<ImageGalleryEntry> entries) throws FileNotFoundException
     {
         // Setup writer
@@ -398,13 +445,13 @@ public abstract class ImageGalleryGenerator
         writer.println("<h1>" + galleryName + "</h1>");
         writer.println("<ul>");
 
-        for(ImageGalleryEntry entry : entries)
+        for (ImageGalleryEntry entry : entries)
         {
             writer.println("<li><a href=\"" +
-                entry.imageFilename +
-                "\" class=\"preview\" title=\"" + entry.caption + "\"><img src=\"" +
-                entry.previewFilename +
-                "\" alt=\"" + entry.caption + "\" /></a></li>");
+                    entry.imageFilename +
+                    "\" class=\"preview\" title=\"" + entry.caption + "\"><img src=\"" +
+                    entry.previewFilename +
+                    "\" alt=\"" + entry.caption + "\" /></a></li>");
         }
         writer.println("</ul>");
         writer.println("</body>");
