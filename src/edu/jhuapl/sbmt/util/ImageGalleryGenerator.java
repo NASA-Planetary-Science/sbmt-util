@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.jidesoft.utils.SwingWorker;
+import javax.swing.SwingWorker;
 
 import edu.jhuapl.saavtk.util.Configuration;
 import edu.jhuapl.saavtk.util.ConvertResourceToFile;
@@ -27,9 +27,13 @@ import edu.jhuapl.sbmt.model.image.IImagingInstrument;
 import edu.jhuapl.sbmt.query.IQueryBase;
 
 /**
- * Class that manages access to image galleries via a local HTML file plus
- * cached images. It is something of a compromise to offer a couple options for
- * how to manage downloads within the legacy implementations of
+ * Class for managing access to image galleries. A gallery is a collection of
+ * reduced images that may be used to browse image search results quickly in a
+ * browser using a web page that is generated on-the-fly for each collection of
+ * search results.
+ * <p>
+ * The current implementation is something of a compromise to offer a couple
+ * options for how to manage downloads within the legacy implementations of
  * {@link IImagingIntrument}, {@link IQueryBase}, and most of all
  * {@link ImageResultsTableController}.
  * <p>
@@ -47,7 +51,7 @@ import edu.jhuapl.sbmt.query.IQueryBase;
  * final because it was designed to have two distinct implementations before the
  * problem was detected that led to the compromise.
  *
- * @author James Peachey
+ * @author Philip Twu, overhauled and augmented by James Peachey in 2021
  *
  */
 public abstract class ImageGalleryGenerator
@@ -57,6 +61,10 @@ public abstract class ImageGalleryGenerator
      */
     private static final Map<String, ImageGalleryGenerator> GalleryMap = new HashMap<>();
 
+    /**
+     * A single gallery entry associated with a gallery image, a
+     * preview/thumbnail image, and a caption
+     */
     public static class ImageGalleryEntry
     {
         private final String caption;
@@ -80,16 +88,36 @@ public abstract class ImageGalleryGenerator
     protected static final SafeURLPaths SAFE_URL_PATHS = SafeURLPaths.instance();
 
     /**
-     * Return a valid generator for the given instrument, or null if the
-     * specified instrument does not have a gallery. The associated gallery is
-     * obtained from the {@link IQueryBase#getGalleryPath()} method for the
-     * query object returned by the specified instrument's
-     * {@link IImagingInstrument#getSearchQuery()} method.
+     * Return a valid {@link ImageGalleryGenerator} for the specified
+     * {@link IImagingInstrument}, or null if a gallery generator cannot be set
+     * up for the instrument. This can happen if the instrument does not include
+     * a gallery (returning null for the path to the gallery), or if an
+     * exception prevents the gallery from being set up completely.
+     * <p>
+     * The location of the associated gallery (if present) is obtained from the
+     * {@link IQueryBase#getGalleryPath()} method for the query object returned
+     * by the specified instrument's {@link IImagingInstrument#getSearchQuery()}
+     * method.
+     * <p>
+     * This method attempts to download an optional file named
+     * "gallery-list.txt", which, if present, is expected to be a 3 column CSV
+     * file associating the name of each image with the name of the preview
+     * (thumbnail) image and finally the name of the gallery image. In the
+     * absence of such a file, the gallery generator assumes the preview image
+     * has the base name from the (full-size) image file but with the suffix
+     * "-small.jpeg". Similarly, the gallery image is assumed to have an
+     * identical basename but extension .jpeg.
+     * <p>
+     * The code also tries to download and unpack an optional file named
+     * "gallery.zip", which, if present, is expected to contain the preview
+     * thumbnail images (but not the gallery images themselves). This is so that
+     * all proprietary thumbnail images may be unpacked in bulk prior to
+     * actually displaying the gallery in the web browser.
      * <p>
      * Successfully-initialized instances of {@link ImageGalleryGenerator} for a
      * specific instrument are cached and looked up based on the gallery path
      * (if a gallery path is non-null). If this method encounters an exception
-     * while trying to initialize an instanct for the given instrument, it will
+     * while trying to initialize an instance for the given instrument, it will
      * return null, but subsequent calls will keep attempting to set up the
      * gallery. This is in case a transient problem is responsible for the
      * exception.
@@ -105,22 +133,27 @@ public abstract class ImageGalleryGenerator
             return null;
         }
 
+        IQueryBase query = instrument.getSearchQuery();
+
+        if (query == null)
+        {
+            return null;
+        }
+
         // Make this final to prevent accidentally changing it before using it
         // to add a map entry.
-        final String galleryPath = instrument.getSearchQuery().getGalleryPath();
+        final String galleryPath = query.getGalleryPath();
 
         if (galleryPath == null)
         {
             return null;
         }
 
-        ImageGalleryGenerator nonFinalGenerator = GalleryMap.get(galleryPath);
-
-        if (nonFinalGenerator != null)
+        if (GalleryMap.containsKey(galleryPath))
         {
-            // There is already a generator set up for this gallery, so just
-            // return it.
-            return nonFinalGenerator;
+            // This method completed successfully before, just return the
+            // result. Note it could be null.
+            return GalleryMap.get(galleryPath);
         }
 
         String galleryParent = galleryPath.replaceFirst("[/\\\\]+[^/\\\\]+$", "");
@@ -136,6 +169,8 @@ public abstract class ImageGalleryGenerator
         }
         catch (NoInternetAccessException e)
         {
+            // Transient problem. Return here -- don't add to the map so this
+            // gets tried again later.
             return null;
         }
         catch (Exception e)
@@ -145,12 +180,19 @@ public abstract class ImageGalleryGenerator
             file = null;
         }
 
-        String dataPath = instrument.getSearchQuery().getDataPath();
+        // Ensure the map will have an entry associated with this key. Make it
+        // null for now, but below if all goes well it will be replaced with a
+        // real gallery generator.
+        GalleryMap.put(galleryPath, null);
+
+        String dataPath = query.getDataPath();
+
+        final ImageGalleryGenerator galleryGenerator;
 
         if (file == null || !file.isFile())
         {
             // Legacy behavior.
-            nonFinalGenerator = new ImageGalleryGenerator() {
+            galleryGenerator = new ImageGalleryGenerator() {
 
                 @Override
                 protected String getPreviewImageFile(String imageFileName)
@@ -181,6 +223,8 @@ public abstract class ImageGalleryGenerator
         }
         else
         {
+            // Read the gallery-list.txt to associate each image with its
+            // thumbnail and gallery image.
             try (BufferedReader reader = new BufferedReader(new FileReader(file)))
             {
 
@@ -205,7 +249,7 @@ public abstract class ImageGalleryGenerator
                     galleryImages.put(imageFilePath, SAFE_URL_PATHS.getString(galleryPath, files[2]));
                 }
 
-                nonFinalGenerator = new ImageGalleryGenerator() {
+                galleryGenerator = new ImageGalleryGenerator() {
 
                     @Override
                     protected String getPreviewImageFile(String imageFileName)
@@ -237,16 +281,24 @@ public abstract class ImageGalleryGenerator
             }
             catch (Exception e)
             {
+                // This exception was thrown by code trying to parse the gallery
+                // list file. If that failed once, it will probably always fail,
+                // so continue -- this result should be cached.
+
                 // This is probably already true; adding explicit "set" here for
                 // completeness and to future-proof in case the code above
                 // changes.
-                nonFinalGenerator = null;
+                System.err.println(e);
+                return null;
             }
-
         }
 
-        ImageGalleryGenerator galleryGenerator = nonFinalGenerator;
+        // Store the gallery generator.
+        GalleryMap.put(galleryPath, galleryGenerator);
 
+        // Finally, try to download and unzip the file that contains all the
+        // preview/thumbnail images. This may take a while, so kick off a
+        // background thread to do this.
         String galleryZipFile = SAFE_URL_PATHS.getString(galleryParent, "gallery.zip");
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 
@@ -263,7 +315,7 @@ public abstract class ImageGalleryGenerator
                 {
                     // Ignore this -- this file is a newer resource, not
                     // present in legacy models. It was added when DART
-                    // models were added.
+                    // simulated models were added.
                     if (zipFile != null && !Debug.isEnabled())
                     {
                         zipFile.delete();
@@ -274,8 +326,6 @@ public abstract class ImageGalleryGenerator
 
         };
         worker.execute();
-
-        GalleryMap.put(galleryPath, galleryGenerator);
 
         return galleryGenerator;
     }
