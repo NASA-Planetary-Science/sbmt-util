@@ -493,6 +493,7 @@ public abstract class ImageGalleryGenerator
         writer.println("    float:left;");
         writer.println("    display:inline;");
         writer.println("    margin-right:10px;");
+        writer.println("    margin-bottom:10px;");
         writer.println("}");
         writer.println("#preview{");
         writer.println("    position:absolute;");
