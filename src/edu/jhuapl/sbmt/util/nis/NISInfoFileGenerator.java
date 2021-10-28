@@ -161,7 +161,7 @@ public class NISInfoFileGenerator
 
         Mission mission = SbmtMultiMissionTool.getMission();
 
-        SmallBodyModel smallBodyModel = SbmtModelFactory.createSmallBodyModel(config);
+        SmallBodyModel smallBodyModel = SbmtModelFactory.createSmallBodyModel(config).get(0);
 
         File sourceDirectory = new File("/Users/steelrj1/Desktop/NIS Data/2000");
         File destinationDirectory = new File("/Users/steelrj1/Desktop/NIS Data/2000/Infofiles");

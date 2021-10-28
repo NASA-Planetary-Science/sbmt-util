@@ -17,8 +17,8 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import edu.jhuapl.saavtk.model.ShapeModelType;
 import edu.jhuapl.saavtk.model.ShapeModelBody;
+import edu.jhuapl.saavtk.model.ShapeModelType;
 import edu.jhuapl.saavtk.util.NativeLibraryLoader;
 import edu.jhuapl.sbmt.client.SbmtModelFactory;
 import edu.jhuapl.sbmt.client.SmallBodyModel;
@@ -53,7 +53,7 @@ public class NisDataSource
         readNisTimes();
         gatherNisDirectories();
         SmallBodyViewConfig config=SmallBodyViewConfig.getSmallBodyConfig(ShapeModelBody.EROS, ShapeModelType.GASKELL);
-        erosModel = SbmtModelFactory.createSmallBodyModel(config);
+        erosModel = SbmtModelFactory.createSmallBodyModel(config).get(0);
         System.out.println("Done.");
     }
 
