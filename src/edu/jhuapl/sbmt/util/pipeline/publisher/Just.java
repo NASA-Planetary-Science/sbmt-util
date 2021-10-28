@@ -21,4 +21,9 @@ public class Just<OutputType extends Object> extends BasePipelinePublisher<Outpu
 	{
 		return new Just<OutputType>(outputs);
 	}
+
+	public static <OutputType extends Object> Just<OutputType> of(List<OutputType> outputs)
+	{
+		return new Just<OutputType>(outputs);
+	}
 }
