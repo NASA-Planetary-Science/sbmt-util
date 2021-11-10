@@ -389,13 +389,13 @@ public abstract class ImageGalleryGenerator
         }
 
         // Copy over required javascript files
-        ConvertResourceToFile.convertResourceToRealFile( //
-                galleryURL, //
-                "/edu/jhuapl/sbmt/data/main.js", //
+        ConvertResourceToFile.convertResourceToRealFile(
+                galleryURL.getClass(), 
+                "/edu/jhuapl/sbmt/data/main.js",
                 Configuration.getCustomGalleriesDir());
-        ConvertResourceToFile.convertResourceToRealFile( //
-                galleryURL, //
-                "/edu/jhuapl/sbmt/data/jquery.js", //
+        ConvertResourceToFile.convertResourceToRealFile(
+                galleryURL.getClass(), 
+                "/edu/jhuapl/sbmt/data/jquery.js",
                 Configuration.getCustomGalleriesDir());
 
         // Return to user to be opened
