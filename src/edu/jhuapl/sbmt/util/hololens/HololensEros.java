@@ -16,9 +16,9 @@ import vtk.vtkPolyDataWriter;
 
 import edu.jhuapl.saavtk.colormap.Colormap;
 import edu.jhuapl.saavtk.colormap.Colormaps;
-import edu.jhuapl.saavtk.model.ColoringData;
 import edu.jhuapl.saavtk.model.ShapeModelBody;
 import edu.jhuapl.saavtk.model.ShapeModelType;
+import edu.jhuapl.saavtk.model.plateColoring.ColoringData;
 import edu.jhuapl.saavtk.util.NativeLibraryLoader;
 import edu.jhuapl.saavtk.util.ObjUtil;
 import edu.jhuapl.sbmt.client.SbmtModelFactory;
@@ -64,13 +64,12 @@ public class HololensEros
         // is used again, there may be side-effects, but that should turn up in routine testing.
         int numberElements = erosModel.getSmallBodyPolyData().GetNumberOfCells();
         ColoringData coloringData = erosModel.getColoringDataManager().get(numberElements).get(coloringIndex);
-        coloringData.load();
         double[] coloringRange=coloringData.getDefaultRange();
         vtkDoubleArray values=new vtkDoubleArray();
         values.SetName("values");
         for (int i=0; i<numberElements; i++)
         {
-            double scaledValue=(coloringData.getData().GetTuple1(i)-coloringRange[0])/(coloringRange[1]-coloringRange[0]);
+            double scaledValue=(coloringData.getData().get(i).get(0)-coloringRange[0])/(coloringRange[1]-coloringRange[0]);
             if (scaledValue<0)
                 scaledValue=0;
             if (scaledValue>1)
