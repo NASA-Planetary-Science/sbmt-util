@@ -39,7 +39,7 @@ public class HololensEros
         int coloringIndex=2; // at the time of implementation index 2 is point-centered elevation data
 
         SmallBodyViewConfig config=SmallBodyViewConfig.getSmallBodyConfig(ShapeModelBody.EROS, ShapeModelType.GASKELL);
-        SmallBodyModel erosModel = SbmtModelFactory.createSmallBodyModel(config).get(0);
+        SmallBodyModel erosModel = SbmtModelFactory.createSmallBodyModel(config);
         erosModel.setColoringIndex(coloringIndex);
 
         Colormap colormap=Colormaps.getNewInstanceOfBuiltInColormap("Spectral_lowBlue");
