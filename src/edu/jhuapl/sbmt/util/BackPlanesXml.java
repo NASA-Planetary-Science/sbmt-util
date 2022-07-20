@@ -18,8 +18,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import nom.tam.fits.HeaderCard;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -27,11 +25,12 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import edu.jhuapl.sbmt.util.BackPlanesXmlMeta.MetaField;
+
 import altwg.Fits.HduTags;
 import altwg.XML.XmlDoc;
 import altwg.XML.XmlDocFactory;
-
-import edu.jhuapl.sbmt.util.BackPlanesXmlMeta.MetaField;
+import nom.tam.fits.HeaderCard;
 
 
 /**
