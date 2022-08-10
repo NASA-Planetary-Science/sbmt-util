@@ -23,7 +23,8 @@ import edu.jhuapl.saavtk.util.FileCache;
 import edu.jhuapl.saavtk.util.NoInternetAccessException;
 import edu.jhuapl.saavtk.util.SafeURLPaths;
 import edu.jhuapl.sbmt.core.image.IImagingInstrument;
-import edu.jhuapl.sbmt.gui.image.controllers.images.ImageResultsTableController;
+import edu.jhuapl.sbmt.image.gui.controllers.images.ImageResultsTableController;
+//import edu.jhuapl.sbmt.image.gui.controllers.images.ImageResultsTableController;
 import edu.jhuapl.sbmt.query.IQueryBase;
 
 /**
@@ -390,11 +391,11 @@ public abstract class ImageGalleryGenerator
 
         // Copy over required javascript files
         ConvertResourceToFile.convertResourceToRealFile(
-                galleryURL.getClass(), 
+                galleryURL.getClass(),
                 "/edu/jhuapl/sbmt/data/main.js",
                 Configuration.getCustomGalleriesDir());
         ConvertResourceToFile.convertResourceToRealFile(
-                galleryURL.getClass(), 
+                galleryURL.getClass(),
                 "/edu/jhuapl/sbmt/data/jquery.js",
                 Configuration.getCustomGalleriesDir());
 
