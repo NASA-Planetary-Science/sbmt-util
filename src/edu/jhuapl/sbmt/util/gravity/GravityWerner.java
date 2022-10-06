@@ -100,7 +100,7 @@ public class GravityWerner extends Gravity {
         super(polyData);
 
         // cache the points to avoid JNI access
-        int numPoints = polyData.GetNumberOfPoints();
+        int numPoints = (int)polyData.GetNumberOfPoints();
         for (int i = 0; i < numPoints; ++i) {
             Point p = new Point();
             polyData.GetPoint(i, p.point);
@@ -111,15 +111,15 @@ public class GravityWerner extends Gravity {
 
         vtkIdList idList = new vtkIdList();
 
-        int numFaces = polyData.GetNumberOfCells();
+        int numFaces = (int)polyData.GetNumberOfCells();
         // Compute the edge data
         for (int i = 0; i < numFaces; ++i) {
             polyData.GetCellPoints(i, idList);
 
             int[] pointIds = new int[3];
-            pointIds[0] = idList.GetId(0);
-            pointIds[1] = idList.GetId(1);
-            pointIds[2] = idList.GetId(2);
+            pointIds[0] = (int)idList.GetId(0);
+            pointIds[1] = (int)idList.GetId(1);
+            pointIds[2] = (int)idList.GetId(2);
 
             double[] pt1 = pointCache.get(pointIds[0]).point;
             double[] pt2 = pointCache.get(pointIds[1]).point;
@@ -196,9 +196,9 @@ public class GravityWerner extends Gravity {
             faceData.add(fd);
 
             polyData.GetCellPoints(i, idList);
-            fd.pointIds[0] = idList.GetId(0);
-            fd.pointIds[1] = idList.GetId(1);
-            fd.pointIds[2] = idList.GetId(2);
+            fd.pointIds[0] = (int)idList.GetId(0);
+            fd.pointIds[1] = (int)idList.GetId(1);
+            fd.pointIds[2] = (int)idList.GetId(2);
 
             double[] pt1 = pointCache.get(fd.pointIds[0]).point;
             double[] pt2 = pointCache.get(fd.pointIds[1]).point;

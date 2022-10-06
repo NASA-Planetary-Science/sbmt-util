@@ -295,7 +295,7 @@ public class PolyDataUtil2 {
         double[] pt2 = new double[3];
         double[] n = new double[3];
 
-        int numCells = polyData.GetNumberOfCells();
+        int numCells = (int)polyData.GetNumberOfCells();
         for (int i = 0; i < numCells; ++i) {
             polyData.GetCellPoints(i, idList);
             polyData.GetPoint(idList.GetId(0), pt0);
@@ -323,7 +323,7 @@ public class PolyDataUtil2 {
         // Average the normals
         double[] centroid = { 0.0, 0.0, 0.0 };
 
-        int numPoints = polyData.GetNumberOfPoints();
+        int numPoints = (int)polyData.GetNumberOfPoints();
         double[] p = new double[3];
         for (int i = 0; i < numPoints; ++i) {
             polyData.GetPoint(i, p);
@@ -389,7 +389,7 @@ public class PolyDataUtil2 {
                     lon = 0.0;
                     LatLon ll = new LatLon(lat * Math.PI / 180.0, lon * Math.PI / 180.0, rad);
                     double[] p = MathUtil.latrec(ll);
-                    int idx = polydata.FindPoint(p);
+                    int idx = (int)polydata.FindPoint(p);
                     if (idx < 0)
                         System.out.println("Error: Could not find closest point");
                     normal = polydata.GetPointData().GetNormals().GetTuple3(idx);
@@ -444,7 +444,7 @@ public class PolyDataUtil2 {
         normalsFilter.Update();
         vtkDataArray normals = normalsFilter.GetOutput().GetCellData().GetNormals();
 
-        int numberCells = polydata.GetNumberOfCells();
+        int numberCells = (int)polydata.GetNumberOfCells();
         vtkIdList idList = new vtkIdList();
 
         double[] pt0 = new double[3];
@@ -469,7 +469,7 @@ public class PolyDataUtil2 {
     static public void adjustShapeModelToOtherShapeModel(vtkPolyData frompolydata, vtkPolyData topolydata)
             throws Exception {
         vtkPoints points = frompolydata.GetPoints();
-        int numberPoints = frompolydata.GetNumberOfPoints();
+        int numberPoints = (int)frompolydata.GetNumberOfPoints();
 
         double diagonalLength = new BoundingBox(topolydata.GetBounds()).getDiagonalLength();
 
@@ -485,7 +485,7 @@ public class PolyDataUtil2 {
         double[] intersectPoint = new double[3];
         double[] pcoords = new double[3];
         int[] subId = new int[1];
-        int[] cell_id = new int[1];
+        long[] cell_id = new long[1];
 
         double[] p = new double[3];
         double[] startPt = new double[] { 0.0, 0.0, 0.0 };
@@ -519,7 +519,7 @@ public class PolyDataUtil2 {
      */
     public static double getMassProperties(vtkPolyData polydata, double[] center, double[][] inertiaWorld,
             double[][] inertiaCOM) {
-        int numberOfCells = polydata.GetNumberOfCells();
+        int numberOfCells = (int)polydata.GetNumberOfCells();
         vtkIdList idList = new vtkIdList();
 
         double[] v0 = new double[3];
@@ -539,9 +539,9 @@ public class PolyDataUtil2 {
 
         for (int i = 0; i < numberOfCells; ++i) {
             polydata.GetCellPoints(i, idList);
-            int id0 = idList.GetId(0);
-            int id1 = idList.GetId(1);
-            int id2 = idList.GetId(2);
+            int id0 = (int)idList.GetId(0);
+            int id1 = (int)idList.GetId(1);
+            int id2 = (int)idList.GetId(2);
             polydata.GetPoint(id0, v0);
             polydata.GetPoint(id1, v1);
             polydata.GetPoint(id2, v2);
@@ -687,7 +687,7 @@ public class PolyDataUtil2 {
         polydata.BuildCells();
         vtkIdList idList = new vtkIdList();
 
-        int numberOfCells = polydata.GetNumberOfCells();
+        int numberOfCells = (int)polydata.GetNumberOfCells();
 
         double[] pt0 = new double[3];
         double[] pt1 = new double[3];
@@ -697,9 +697,9 @@ public class PolyDataUtil2 {
         DescriptiveStatistics areaStatistics = new DescriptiveStatistics();
         for (int i = 0; i < numberOfCells; ++i) {
             polydata.GetCellPoints(i, idList);
-            int id0 = idList.GetId(0);
-            int id1 = idList.GetId(1);
-            int id2 = idList.GetId(2);
+            int id0 = (int)idList.GetId(0);
+            int id1 = (int)idList.GetId(1);
+            int id2 = (int)idList.GetId(2);
             polydata.GetPoint(id0, pt0);
             polydata.GetPoint(id1, pt1);
             polydata.GetPoint(id2, pt2);
@@ -744,13 +744,13 @@ public class PolyDataUtil2 {
             // massProp.GetMaxCellArea());
         }
 
-        statistics.eulerPolyhedronFormula = polydata.GetNumberOfPoints() - edges.size() + numberOfCells;
+        statistics.eulerPolyhedronFormula = (int)polydata.GetNumberOfPoints() - edges.size() + numberOfCells;
 
         polydata.ComputeBounds();
         statistics.boundingBox.setBounds(polydata.GetBounds());
 
         statistics.numberPlates = numberOfCells;
-        statistics.numberVertices = polydata.GetNumberOfPoints();
+        statistics.numberVertices = (int)polydata.GetNumberOfPoints();
         statistics.numberEdges = edges.size();
         statistics.surfaceArea = areaStatistics.getSum();
         statistics.meanCellArea = areaStatistics.getMean();
@@ -781,7 +781,7 @@ public class PolyDataUtil2 {
         double[] pt1 = new double[3];
         double[] pt2 = new double[3];
         double[] center = new double[3];
-        int numCells = polyData.GetNumberOfCells();
+        int numCells = (int)polyData.GetNumberOfCells();
         for (int i = 0; i < numCells; ++i) {
 
             polyData.GetCellPoints(i, idList);

@@ -36,7 +36,7 @@ public class NisProcessor implements Runnable
     {
         this.data=data;
         this.smallBodyModel = model;
-        faceSamples=new List[data.erosModel.getSmallBodyPolyData().GetNumberOfCells()];
+        faceSamples=new List[(int)data.erosModel.getSmallBodyPolyData().GetNumberOfCells()];
         for (int i=0; i<faceSamples.length; i++)
             faceSamples[i]=Lists.newArrayList();
         //
@@ -87,7 +87,7 @@ public class NisProcessor implements Runnable
                 }
                 //
                 vtkIdTypeArray originalIds=(vtkIdTypeArray)footprint.GetCellData().GetArray(GenericPolyhedralModel.cellIdsArrayName);
-                int originalId=originalIds.GetValue(c);
+                int originalId=(int)originalIds.GetValue(c);
                 vtkTriangle tri=(vtkTriangle)data.erosModel.getSmallBodyPolyData().GetCell(originalId);  // tri on original body model
                 vtkTriangle ftri=(vtkTriangle)footprint.GetCell(c); // tri on footprint
                 double[] ftriCenter=new double[3];

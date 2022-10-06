@@ -407,7 +407,7 @@ abstract public class Gravity {
             double[] pt2) {
         polydata.GetCellPoints(cellId, idList);
 
-        int numberOfCells = idList.GetNumberOfIds();
+        int numberOfCells = (int)idList.GetNumberOfIds();
         if (numberOfCells != 3) {
             System.err.println("Error: Cells must have exactly 3 vertices!");
             return;
@@ -464,9 +464,9 @@ abstract public class Gravity {
         DescriptiveStatistics tiltStats = new DescriptiveStatistics();
 
         double[] pt = new double[3];
-        int size = idList.GetNumberOfIds();
+        int size = (int)idList.GetNumberOfIds();
         for (int i = 0; i < size; ++i) {
-            int id = idList.GetId(i);
+            int id = (int)idList.GetId(i);
             polyData.GetPoint(id, pt);
             double tilt = getTilt(pt, normalVector);
             tiltStats.addValue(tilt);
@@ -507,7 +507,7 @@ abstract public class Gravity {
         pointLocator.SetDataSet(polyDataCenters);
         pointLocator.BuildLocator();
 
-        int numCells = polydata.GetNumberOfCells();
+        int numCells = (int)polydata.GetNumberOfCells();
         for (int i = 0; i < numCells; ++i) {
             CellInfo ci = getCellInfo(polydata, i, idList);
             List<Double> row = new ArrayList<Double>();
@@ -555,7 +555,7 @@ abstract public class Gravity {
         vtkIdList idList = new vtkIdList();
         SmallBodyModel smallBodyModel = new SmallBodyModel(csvfile, polydata);
 
-        int numPoints = polydata.GetNumberOfPoints();
+        int numPoints = (int)polydata.GetNumberOfPoints();
         for (int i = 0; i < numPoints; ++i) {
             PointInfo pi = getPointInfo(polydata, i);
             List<Double> row = new ArrayList<Double>();
@@ -744,7 +744,7 @@ abstract public class Gravity {
     }
 
     private double getRefPotential(List<GravityValues> results) {
-        int numFaces = globalShapeModelPolyData.GetNumberOfCells();
+        int numFaces = (int)globalShapeModelPolyData.GetNumberOfCells();
 
         if (howToEvalute == HowToEvaluate.EVALUATE_AT_CENTERS && results.size() != numFaces) {
             System.err.println("Error: Size of array not equal to number of plates");
@@ -772,9 +772,9 @@ abstract public class Gravity {
             }
             else if (howToEvalute == HowToEvaluate.EVALUATE_AT_VERTICES) {
                 // Average potential at 3 vertices
-                int p1 = idList.GetId(0);
-                int p2 = idList.GetId(1);
-                int p3 = idList.GetId(2);
+                int p1 = (int)idList.GetId(0);
+                int p2 = (int)idList.GetId(1);
+                int p3 = (int)idList.GetId(2);
                 potential = (results.get(p1).potential + results.get(p2).potential + results.get(p3).potential) / 3.0;
             }
 
@@ -838,9 +838,9 @@ abstract public class Gravity {
             double[] pt1 = new double[3];
             double[] pt2 = new double[3];
             double[] pt3 = new double[3];
-            int id1 = idList.GetId(0);
-            int id2 = idList.GetId(1);
-            int id3 = idList.GetId(2);
+            int id1 = (int)idList.GetId(0);
+            int id2 = (int)idList.GetId(1);
+            int id3 = (int)idList.GetId(2);
             globalShapeModelPolyData.GetPoint(id1, pt1);
             globalShapeModelPolyData.GetPoint(id2, pt2);
             globalShapeModelPolyData.GetPoint(id3, pt3);
@@ -859,7 +859,7 @@ abstract public class Gravity {
 
     private List<GravityValues> getGravityAtPlateCenters() throws InterruptedException, ExecutionException {
 
-        List<GravityValues> results = ParallelLoop.runParallelLoop(globalShapeModelPolyData.GetNumberOfCells(), new LoopFunction() {
+        List<GravityValues> results = ParallelLoop.runParallelLoop((int)globalShapeModelPolyData.GetNumberOfCells(), new LoopFunction() {
             @Override
             public List<GravityValues> func(int startId, int stopId) {
                 return getGravityAtPlateCenters(startId, stopId);
@@ -887,7 +887,7 @@ abstract public class Gravity {
 
     private List<GravityValues> getGravityAtShapeModelVertices() throws InterruptedException, ExecutionException {
 
-        List<GravityValues> results = ParallelLoop.runParallelLoop(globalShapeModelPolyData.GetNumberOfPoints(), new LoopFunction() {
+        List<GravityValues> results = ParallelLoop.runParallelLoop((int)globalShapeModelPolyData.GetNumberOfPoints(), new LoopFunction() {
             @Override
             public List<GravityValues> func(int startId, int stopId) {
                 return getGravityAtShapeModelVertices(startId, stopId);

@@ -650,7 +650,7 @@ public class SBMTGMTGridUtil {
         int halfSize = 250;
 
         vtkPolyData polyData = PolyDataUtil.loadOBJShapeModel(objFile);
-        int numCells = polyData.GetNumberOfCells();
+        int numCells = (int)polyData.GetNumberOfCells();
         vtkIdList cellPointIDS = new vtkIdList();
         double[] x = new double[numCells];
         double[] y = new double[numCells];

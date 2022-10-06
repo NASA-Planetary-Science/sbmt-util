@@ -36,7 +36,7 @@ public class GravityCheng extends Gravity {
         super(polyData);
 
         // cache the points to avoid JNI access
-        int numPoints = polyData.GetNumberOfPoints();
+        int numPoints = (int)polyData.GetNumberOfPoints();
         for (int i = 0; i < numPoints; ++i) {
             Point p = new Point();
             polyData.GetPoint(i, p.point);
@@ -45,15 +45,15 @@ public class GravityCheng extends Gravity {
 
         vtkIdList idList = new vtkIdList();
         // Compute the face data
-        int numFaces = polyData.GetNumberOfCells();
+        int numFaces = (int)polyData.GetNumberOfCells();
         for (int i = 0; i < numFaces; ++i) {
             FaceData fc = new FaceData();
             faceData.add(fc);
 
             polyData.GetCellPoints(i, idList);
-            int p1 = idList.GetId(0);
-            int p2 = idList.GetId(1);
-            int p3 = idList.GetId(2);
+            int p1 = (int)idList.GetId(0);
+            int p2 = (int)idList.GetId(1);
+            int p3 = (int)idList.GetId(2);
             fc.pointIds[0] = p1;
             fc.pointIds[1] = p2;
             fc.pointIds[2] = p3;

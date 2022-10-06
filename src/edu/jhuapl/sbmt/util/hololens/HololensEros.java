@@ -62,7 +62,7 @@ public class HololensEros
         // ColoringData and ColoringDataManager instead of the now removed ColoringInfo class.
         // However, because of other runtime errors, these changes were not tested. If this code
         // is used again, there may be side-effects, but that should turn up in routine testing.
-        int numberElements = erosModel.getSmallBodyPolyData().GetNumberOfCells();
+        int numberElements = (int)erosModel.getSmallBodyPolyData().GetNumberOfCells();
         ColoringData coloringData = erosModel.getColoringDataManager().get(numberElements).get(coloringIndex);
         double[] coloringRange=coloringData.getDefaultRange();
         vtkDoubleArray values=new vtkDoubleArray();

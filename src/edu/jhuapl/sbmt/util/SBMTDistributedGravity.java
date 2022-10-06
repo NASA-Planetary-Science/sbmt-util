@@ -462,8 +462,8 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	        pointLocator.SetDataSet(polyDataCenters);
 	        pointLocator.BuildLocator();
 
-	        int numCells = polydata.GetNumberOfCells();
-	        double[] radialErrorAtPoint = new double[polydata.GetNumberOfPoints()];
+	        int numCells = (int)polydata.GetNumberOfCells();
+	        double[] radialErrorAtPoint = new double[(int)polydata.GetNumberOfPoints()];
 	        if (sigmaData != null) {
 	            for (int i = 0; i < radialErrorAtPoint.length; i++)
 	                radialErrorAtPoint[i] = sigmaData.GetValue(i);
@@ -475,7 +475,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	            // the radius uncertainty is dimensionless - (dr/r)^2 is used in the error formulas
 	            double radiusUncertainty2 = 0;
 	            for (int j = 0; j < 3; j++)
-	                radiusUncertainty2 += radialErrorAtPoint[idList.GetId(j)] * radialErrorAtPoint[idList.GetId(j)];
+	                radiusUncertainty2 += radialErrorAtPoint[(int)idList.GetId(j)] * radialErrorAtPoint[(int)idList.GetId(j)];
 
 	            double radius2 = MathUtil.vnorm(ci.center);
 	            radius2 *= radius2;
@@ -883,7 +883,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	    }
 
 	    private static double getRefPotential(List<GravityValues> results, boolean minRefPotential) {
-	        int numFaces = globalShapeModelPolyData.GetNumberOfCells();
+	        int numFaces = (int)globalShapeModelPolyData.GetNumberOfCells();
 //	        System.out.println("SBMTDistributedGravity: getRefPotential: ");
 	        if (minRefPotential) {
 	            System.out.println("Using minimum Potential as gravity reference potential");
@@ -1632,7 +1632,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	     */
 	    private static void saveLocalFitsCenters(vtkPolyData fitspolyData, String fieldpointsfile) throws IOException {
 //	    	System.out.println("SBMTDistributedGravity: saveLocalFitsCenters: ");
-	        int numCells = fitspolyData.GetNumberOfCells();
+	        int numCells = (int)fitspolyData.GetNumberOfCells();
 	        vtkIdList cellPointIDS = new vtkIdList();
 
 	        // loop over all the cells and write out center x,y,z, normal x,y,z to ascii file.
@@ -1717,7 +1717,7 @@ public class SBMTDistributedGravity implements ALTWGTool {
 	     */
 	    private static double[][] valuesToRegrid(List<GravityValues> gravAtLocations, vtkPolyData polyData) {
 //	    	System.out.println("SBMTDistributedGravity: valuesToRegrid: ");
-	        int numCells = polyData.GetNumberOfCells();
+	        int numCells = (int)polyData.GetNumberOfCells();
 
 	        int numGravPlanes = regridInds.size();
 

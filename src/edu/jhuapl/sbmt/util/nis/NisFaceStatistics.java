@@ -56,8 +56,8 @@ public class NisFaceStatistics
 
         int nBins=18;
         double[] phaseAngleBinEdges=LinearSpace.create(0, 180, nBins+1);
-        int[][] counts=new int[polyData.GetNumberOfCells()][nBins];
-        double[][] spectra=new double[polyData.GetNumberOfCells()][nBins];
+        int[][] counts=new int[(int)polyData.GetNumberOfCells()][nBins];
+        double[][] spectra=new double[(int)polyData.GetNumberOfCells()][nBins];
 
         int spectrumComponent=1;
 
