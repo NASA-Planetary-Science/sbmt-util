@@ -20,7 +20,7 @@ public class TimeUtil
 		try
 		{
 			File lskFile = ConvertResourceToFile.convertResourceToRealFile(TimeUtil.class,
-					"/edu/jhuapl/sbmt/data/naif0010.tls", Configuration.getApplicationDataDir());
+					"/edu/jhuapl/sbmt/data/naif0012.tls", Configuration.getApplicationDataDir());
 
 			CSPICE.furnsh(lskFile.getAbsolutePath());
 		}
