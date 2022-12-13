@@ -415,10 +415,14 @@ public abstract class ImageGalleryGenerator
 
     public ImageGalleryEntry getEntry(String imageFileName)
     {
-        String imageFileUrl = SAFE_URL_PATHS.getString(Configuration.getDataRootURL().toString(), getGalleryImageFile(imageFileName));
-        String previewFileUrl = locateGalleryFile(getPreviewImageFile(imageFileName));
+        String imageFileBaseName = new File(imageFileName).getName();
+        String galleryFileBaseName = getGalleryImageFile(imageFileName);
+        String previewFileBaseName = getPreviewImageFile(imageFileName);
 
-        return new ImageGalleryEntry(imageFileName.substring(imageFileName.lastIndexOf("/") + 1), imageFileUrl, previewFileUrl);
+        String imageFileUrl = galleryFileBaseName != null ? SAFE_URL_PATHS.getString(Configuration.getDataRootURL().toString(), galleryFileBaseName) : null;
+        String previewFileUrl = previewFileBaseName != null ? locateGalleryFile(previewFileBaseName) : null;
+
+        return new ImageGalleryEntry(imageFileBaseName, imageFileUrl, previewFileUrl);
     }
 
     protected abstract String getPreviewImageFile(String imageFileName);
@@ -524,11 +528,23 @@ public abstract class ImageGalleryGenerator
 
         for (ImageGalleryEntry entry : entries)
         {
-            writer.println("<li><a href=\"" +
-                    entry.imageFilename +
-                    "\" class=\"preview\" title=\"" + entry.caption + "\"><img src=\"" +
-                    entry.previewFilename +
-                    "\" alt=\"" + entry.caption + "\" /></a></li>");
+            String alt;
+            if (entry.imageFilename != null)
+            {
+                alt = new File(entry.imageFilename).getName();
+            }
+            else
+            {
+                alt = "Missing " + entry.caption.replaceFirst("\\.[^\\.]*$", "");
+            }
+
+            String line = String.format( //
+                    "<li><a href=\"%s\" class=\"preview\" title=\"%s\"><img src=\"%s\" alt=\"%s\" /></a></li>", //
+                    entry.imageFilename != null ? entry.imageFilename : "", //
+                    entry.caption, //
+                    entry.previewFilename != null ? entry.previewFilename : "", //
+                    alt);
+            writer.println(line);
         }
         writer.println("</ul>");
         writer.println("</body>");
