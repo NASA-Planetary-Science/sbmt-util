@@ -33,7 +33,7 @@ import edu.jhuapl.sbmt.query.IQueryBase;
  * The current implementation is something of a compromise to offer a couple
  * options for how to manage downloads within the legacy implementations of
  * {@link IImagingIntrument}, {@link IQueryBase}, and most of all
- * {@link ImageResultsTableController}.
+ * {@link edu.jhuapl.sbmt.image.gui.controllers.images.ImageResultsTableController}.
  * <p>
  * The compromise is needed because the factory method
  * {@link ImageGalleryGenerator#of(IImagingInstrument)} may be called multiple
@@ -359,34 +359,34 @@ public abstract class ImageGalleryGenerator
         // Define location and name of gallery file
         String galleryURL = SAFE_URL_PATHS.getString(Configuration.getCacheDir(), "gallery.html");
 
-//        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-//
-//            @Override
-//            protected Void doInBackground() throws Exception
-//            {
-//                for (ImageGalleryEntry entry : entries) {
-//                    try
-//                    {
-//                        FileCache.getFileFromServer(entry.previewFilename);
-//                    }
-//                    catch (Exception e)
-//                    {
-//
-//                    }
-//                    try
-//                    {
-//                        FileCache.getFileFromServer(entry.imageFilename);
-//                    }
-//                    catch (Exception e)
-//                    {
-//
-//                    }
-//                }
-//                return null;
-//            }
-//
-//        };
-//        worker.execute();
+        // SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+        //
+        // @Override
+        // protected Void doInBackground() throws Exception
+        // {
+        // for (ImageGalleryEntry entry : entries) {
+        // try
+        // {
+        // FileCache.getFileFromServer(entry.previewFilename);
+        // }
+        // catch (Exception e)
+        // {
+        //
+        // }
+        // try
+        // {
+        // FileCache.getFileFromServer(entry.imageFilename);
+        // }
+        // catch (Exception e)
+        // {
+        //
+        // }
+        // }
+        // return null;
+        // }
+        //
+        // };
+        // worker.execute();
 
         // Generate the image gallery
         try
@@ -402,13 +402,11 @@ public abstract class ImageGalleryGenerator
         }
 
         // Copy over required javascript files
-        ConvertResourceToFile.convertResourceToRealFile(
-                galleryURL.getClass(),
-                "/edu/jhuapl/sbmt/data/main.js",
+        ConvertResourceToFile.convertResourceToRealFile(galleryURL.getClass(), //
+                "/edu/jhuapl/sbmt/data/main.js", //
                 Configuration.getCustomGalleriesDir());
-        ConvertResourceToFile.convertResourceToRealFile(
-                galleryURL.getClass(),
-                "/edu/jhuapl/sbmt/data/jquery.js",
+        ConvertResourceToFile.convertResourceToRealFile(galleryURL.getClass(), //
+                "/edu/jhuapl/sbmt/data/jquery.js", //
                 Configuration.getCustomGalleriesDir());
 
         // Return to user to be opened
