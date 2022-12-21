@@ -21,6 +21,7 @@ import edu.jhuapl.saavtk.util.DownloadableFileState;
 import edu.jhuapl.saavtk.util.FileCache;
 import edu.jhuapl.saavtk.util.NoInternetAccessException;
 import edu.jhuapl.saavtk.util.SafeURLPaths;
+import edu.jhuapl.saavtk.util.UnauthorizedAccessException;
 import edu.jhuapl.sbmt.core.image.IImagingInstrument;
 import edu.jhuapl.sbmt.query.IQueryBase;
 
@@ -199,6 +200,11 @@ public abstract class ImageGalleryGenerator
             // Transient problem. Return here -- don't add to the map so this
             // gets tried again later.
             return null;
+        }
+        catch (UnauthorizedAccessException e)
+        {
+            e.printStackTrace();
+            file = null;
         }
         catch (Exception e)
         {
