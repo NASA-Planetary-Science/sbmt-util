@@ -4,6 +4,7 @@ import java.io.File;
 
 import edu.jhuapl.saavtk.util.Configuration;
 import edu.jhuapl.saavtk.util.ConvertResourceToFile;
+import edu.jhuapl.saavtk.util.NativeLibraryLoader;
 
 import spice.basic.CSPICE;
 import spice.basic.SpiceErrorException;
@@ -16,7 +17,8 @@ public class TimeUtil
 {
 	static
 	{
-		System.loadLibrary("JNISpice");
+		NativeLibraryLoader.loadSpiceLibraries();
+//		System.loadLibrary("JNISpice");
 		try
 		{
 			File lskFile = ConvertResourceToFile.convertResourceToRealFile(TimeUtil.class,
