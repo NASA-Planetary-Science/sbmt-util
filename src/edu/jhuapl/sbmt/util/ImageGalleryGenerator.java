@@ -181,6 +181,10 @@ public abstract class ImageGalleryGenerator
         {
             // This method completed successfully before, just return the
             // result. Note it could be null.
+        	if (listener != null)
+            {
+                listener.respond(null);
+            }
             return GalleryMap.get(galleryPath);
         }
 
