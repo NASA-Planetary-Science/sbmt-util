@@ -21,9 +21,8 @@ import edu.jhuapl.saavtk.util.DownloadableFileState;
 import edu.jhuapl.saavtk.util.FileCache;
 import edu.jhuapl.saavtk.util.NoInternetAccessException;
 import edu.jhuapl.saavtk.util.SafeURLPaths;
+import edu.jhuapl.saavtk.util.UnauthorizedAccessException;
 import edu.jhuapl.sbmt.core.image.IImagingInstrument;
-import edu.jhuapl.sbmt.image.gui.controllers.images.ImageResultsTableController;
-//import edu.jhuapl.sbmt.image.gui.controllers.images.ImageResultsTableController;
 import edu.jhuapl.sbmt.query.IQueryBase;
 
 /**
@@ -35,7 +34,7 @@ import edu.jhuapl.sbmt.query.IQueryBase;
  * The current implementation is something of a compromise to offer a couple
  * options for how to manage downloads within the legacy implementations of
  * {@link IImagingIntrument}, {@link IQueryBase}, and most of all
- * {@link ImageResultsTableController}.
+ * {@link edu.jhuapl.sbmt.image.gui.controllers.images.ImageResultsTableController}.
  * <p>
  * The compromise is needed because the factory method
  * {@link ImageGalleryGenerator#of(IImagingInstrument)} may be called multiple
@@ -182,6 +181,10 @@ public abstract class ImageGalleryGenerator
         {
             // This method completed successfully before, just return the
             // result. Note it could be null.
+        	if (listener != null)
+            {
+                listener.respond(null);
+            }
             return GalleryMap.get(galleryPath);
         }
 
@@ -201,6 +204,11 @@ public abstract class ImageGalleryGenerator
             // Transient problem. Return here -- don't add to the map so this
             // gets tried again later.
             return null;
+        }
+        catch (UnauthorizedAccessException e)
+        {
+            e.printStackTrace();
+            file = null;
         }
         catch (Exception e)
         {
@@ -361,34 +369,34 @@ public abstract class ImageGalleryGenerator
         // Define location and name of gallery file
         String galleryURL = SAFE_URL_PATHS.getString(Configuration.getCacheDir(), "gallery.html");
 
-//        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-//
-//            @Override
-//            protected Void doInBackground() throws Exception
-//            {
-//                for (ImageGalleryEntry entry : entries) {
-//                    try
-//                    {
-//                        FileCache.getFileFromServer(entry.previewFilename);
-//                    }
-//                    catch (Exception e)
-//                    {
-//
-//                    }
-//                    try
-//                    {
-//                        FileCache.getFileFromServer(entry.imageFilename);
-//                    }
-//                    catch (Exception e)
-//                    {
-//
-//                    }
-//                }
-//                return null;
-//            }
-//
-//        };
-//        worker.execute();
+        // SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+        //
+        // @Override
+        // protected Void doInBackground() throws Exception
+        // {
+        // for (ImageGalleryEntry entry : entries) {
+        // try
+        // {
+        // FileCache.getFileFromServer(entry.previewFilename);
+        // }
+        // catch (Exception e)
+        // {
+        //
+        // }
+        // try
+        // {
+        // FileCache.getFileFromServer(entry.imageFilename);
+        // }
+        // catch (Exception e)
+        // {
+        //
+        // }
+        // }
+        // return null;
+        // }
+        //
+        // };
+        // worker.execute();
 
         // Generate the image gallery
         try
@@ -404,13 +412,11 @@ public abstract class ImageGalleryGenerator
         }
 
         // Copy over required javascript files
-        ConvertResourceToFile.convertResourceToRealFile(
-                galleryURL.getClass(),
-                "/edu/jhuapl/sbmt/data/main.js",
+        ConvertResourceToFile.convertResourceToRealFile(galleryURL.getClass(), //
+                "/edu/jhuapl/sbmt/data/main.js", //
                 Configuration.getCustomGalleriesDir());
-        ConvertResourceToFile.convertResourceToRealFile(
-                galleryURL.getClass(),
-                "/edu/jhuapl/sbmt/data/jquery.js",
+        ConvertResourceToFile.convertResourceToRealFile(galleryURL.getClass(), //
+                "/edu/jhuapl/sbmt/data/jquery.js", //
                 Configuration.getCustomGalleriesDir());
 
         // Return to user to be opened
@@ -419,10 +425,14 @@ public abstract class ImageGalleryGenerator
 
     public ImageGalleryEntry getEntry(String imageFileName)
     {
-        String imageFileUrl = SAFE_URL_PATHS.getString(Configuration.getDataRootURL().toString(), getGalleryImageFile(imageFileName));
-        String previewFileUrl = locateGalleryFile(getPreviewImageFile(imageFileName));
+        String imageFileBaseName = new File(imageFileName).getName();
+        String galleryFileBaseName = getGalleryImageFile(imageFileName);
+        String previewFileBaseName = getPreviewImageFile(imageFileName);
 
-        return new ImageGalleryEntry(imageFileName.substring(imageFileName.lastIndexOf("/") + 1), imageFileUrl, previewFileUrl);
+        String imageFileUrl = galleryFileBaseName != null ? SAFE_URL_PATHS.getString(Configuration.getDataRootURL().toString(), galleryFileBaseName) : null;
+        String previewFileUrl = previewFileBaseName != null ? locateGalleryFile(previewFileBaseName) : null;
+
+        return new ImageGalleryEntry(imageFileBaseName, imageFileUrl, previewFileUrl);
     }
 
     protected abstract String getPreviewImageFile(String imageFileName);
@@ -528,11 +538,23 @@ public abstract class ImageGalleryGenerator
 
         for (ImageGalleryEntry entry : entries)
         {
-            writer.println("<li><a href=\"" +
-                    entry.imageFilename +
-                    "\" class=\"preview\" title=\"" + entry.caption + "\"><img src=\"" +
-                    entry.previewFilename +
-                    "\" alt=\"" + entry.caption + "\" /></a></li>");
+            String alt;
+            if (entry.imageFilename != null)
+            {
+                alt = new File(entry.imageFilename).getName();
+            }
+            else
+            {
+                alt = "Missing " + entry.caption.replaceFirst("\\.[^\\.]*$", "");
+            }
+
+            String line = String.format( //
+                    "<li><a href=\"%s\" class=\"preview\" title=\"%s\"><img src=\"%s\" alt=\"%s\" /></a></li>", //
+                    entry.imageFilename != null ? entry.imageFilename : "", //
+                    entry.caption, //
+                    entry.previewFilename != null ? entry.previewFilename : "", //
+                    alt);
+            writer.println(line);
         }
         writer.println("</ul>");
         writer.println("</body>");
