@@ -86,10 +86,21 @@ public class SBMTNativeLibraryLoader extends NativeLibraryLoader {
 	}
 
 	private enum gdalNativeLibrary {
-		libcfitsio("libcfitsio.9"), libhdf5_hl("libhdf5_hl.200"), libhdf200("libhdf5.200"), libjpeg("libjpeg.9"),
-		libnetcdf("libnetcdf.19"), libpng16("libpng16.16"), libproj("libproj.25"), libsz("libsz.2"),
-		libtiff("libtiff.5"), libtiledb("libtiledb"), libwebp("libwebp.7"), libzstd("libzstd.1.5.4"),
-		libgdal("libgdal.31"), libgdalalljni("libgdalalljni");
+//		libcfitsio("libcfitsio.9"),
+//		libhdf5_hl("libhdf5_hl.200"),
+//		libhdf200("libhdf5.200"),
+//		libjpeg("libjpeg.9"),
+//		libnetcdf("libnetcdf.19"),
+//		libpng16("libpng16.16"),
+		libopenjp2("libopenjp2.7"),
+		libproj("libproj.25"),
+//		libsz("libsz.2"),
+//		libtiff("libtiff.5"),
+//		libtiledb("libtiledb"),
+//		libwebp("libwebp.7"),
+//		libzstd("libzstd.1.5.4"),
+		libgdal("libgdal.33"),
+		libgdalalljni("libgdalalljni");
 
 		private String filename;
 
@@ -137,6 +148,14 @@ public class SBMTNativeLibraryLoader extends NativeLibraryLoader {
     }
 
 	public static void loadGDALLibraries() {
+
+
+//		try {
+//		Runtime.getRuntime().loadLibrary("libgdal");
+//		}  catch (UnsatisfiedLinkError e) {
+//			e.printStackTrace();
+//		}
+
 		System.out.println("SBMTNativeLibraryLoader: loadGDALLibraries: loading all GDAL libs");
     	try {
     		File nativeDir = new File(System.getProperty("user.home") + File.separator +".nativelibs");
