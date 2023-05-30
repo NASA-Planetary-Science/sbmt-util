@@ -74,7 +74,7 @@ public class SBMTNativeLibraryLoader extends NativeLibraryLoader {
 	public static File createNativeGDALDirectory(File nativeLibraryBaseDirectory) throws GDALJavaNativeLibraryException {
 
 		File nativeLibraryDirectory = new File(nativeLibraryBaseDirectory,
-				"gdalnatives-" + MAJOR_VERSION + "." + MINOR_VERSION);
+				"gdaljavanatives-" + MAJOR_VERSION + "." + MINOR_VERSION);
 		try {
 			if (!nativeLibraryDirectory.exists()) {
 				nativeLibraryDirectory.mkdirs();
@@ -180,23 +180,23 @@ public class SBMTNativeLibraryLoader extends NativeLibraryLoader {
         }
 
 		boolean caughtLinkError = false;
-		System.out.println("SBMTNativeLibraryLoader: loadGDALLibraries: native before loop " + nativeGDALLibraryDir);
-		for (gdalNativeLibrary lib : gdalNativeLibrary.values()) {
-			try {
-//                  if (!lib.IsLoaded())
-				{
-					System.out.println("SBMTNativeLibraryLoader: loadGDALLibraries: trying to load "
-							+ new File(nativeGDALLibraryDir, lib.getFilename() + ".dylib").getAbsolutePath());
-					Runtime.getRuntime()
-							.load(new File(nativeGDALLibraryDir, lib.getFilename() + ".dylib").getAbsolutePath());
-//                  	System.load(new File(nativeGDALLibraryDir, lib.getFilename() + ".dylib").getAbsolutePath());
-
-				}
-			} catch (UnsatisfiedLinkError e) {
-				caughtLinkError = true;
-				e.printStackTrace();
-			}
-		}
+//		System.out.println("SBMTNativeLibraryLoader: loadGDALLibraries: native before loop " + nativeGDALLibraryDir);
+//		for (gdalNativeLibrary lib : gdalNativeLibrary.values()) {
+//			try {
+////                  if (!lib.IsLoaded())
+//				{
+//					System.out.println("SBMTNativeLibraryLoader: loadGDALLibraries: trying to load "
+//							+ new File(nativeGDALLibraryDir, lib.getFilename() + ".dylib").getAbsolutePath());
+//					Runtime.getRuntime()
+//							.load(new File(nativeGDALLibraryDir, lib.getFilename() + ".dylib").getAbsolutePath());
+////                  	System.load(new File(nativeGDALLibraryDir, lib.getFilename() + ".dylib").getAbsolutePath());
+//
+//				}
+//			} catch (UnsatisfiedLinkError e) {
+//				caughtLinkError = true;
+//				e.printStackTrace();
+//			}
+//		}
 
 		if (caughtLinkError) {
 			throw new UnsatisfiedLinkError("One or more GDAL libraries failed to load");
