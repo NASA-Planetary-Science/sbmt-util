@@ -1,7 +1,7 @@
 package edu.jhuapl.sbmt.util;
 
-import static ch.unibas.cs.gravis.vtkjavanativelibs.VtkNativeLibraries.MAJOR_VERSION;
-import static ch.unibas.cs.gravis.vtkjavanativelibs.VtkNativeLibraries.MINOR_VERSION;
+import static ch.unibas.cs.gravis.gdaljavanativelibs.GDALNativeLibraries.MAJOR_VERSION;
+import static ch.unibas.cs.gravis.gdaljavanativelibs.GDALNativeLibraries.MINOR_VERSION;
 
 import java.awt.EventQueue;
 import java.io.File;
@@ -41,7 +41,6 @@ public class SBMTNativeLibraryLoader extends NativeLibraryLoader {
 
 		// Create the target directory if it does not exist
 		nativeGDALLibraryDir = createNativeGDALDirectory(nativeLibraryBaseDirectory);
-		System.out.println("native gdal is " + nativeGDALLibraryDir);
 
 		if (debug)
 			System.out.println("Extract GDAL to " + nativeGDALLibraryDir);
@@ -64,7 +63,6 @@ public class SBMTNativeLibraryLoader extends NativeLibraryLoader {
 			String nativeName = libraryUrl.getFile();
 			File file = new File(nativeGDALLibraryDir,
 					nativeName.substring(nativeName.lastIndexOf('/') + 1, nativeName.length()));
-//	          System.out.println("file is " + file.getAbsolutePath());
 			Runtime.getRuntime().load(file.getAbsolutePath());
 		}
 
@@ -115,18 +113,21 @@ public class SBMTNativeLibraryLoader extends NativeLibraryLoader {
 
     private static void unpackNatives()
     {
-    	System.out.println("gdal-native version: " + MAJOR_VERSION + "." + MINOR_VERSION);
-        System.out.println("Java version: " + System.getProperty("java.version"));
-        System.out.println("Current platform: " + Platform.getPlatform());
+    	if (debug)
+    	{
+	    	System.out.println("GDAL: gdal-native version: " + MAJOR_VERSION + "." + MINOR_VERSION);
+	        System.out.println("GDAL: Java version: " + System.getProperty("java.version"));
+	        System.out.println("GDAL: Current platform: " + Platform.getPlatform());
+    	}
         if (Platform.isUnknown()) {
         	System.err.println("Cannot determine the platform you are running on.");
         	System.exit(1);
         }
 
-//        File nativeDir = new File(System.getProperty("java.io.tmpdir"));
         File nativeDir = new File(System.getProperty("user.home") + File.separator +".nativelibs");
 
-        System.out.println("GDAL: Will unpack to : " + nativeDir);
+        if (debug)
+        	System.out.println("GDAL: Will unpack to : " + nativeDir);
 
         try {
             SBMTNativeLibraryLoader.initialize(nativeDir);
@@ -137,26 +138,10 @@ public class SBMTNativeLibraryLoader extends NativeLibraryLoader {
             System.err.println("stacktrace above.");
             System.exit(1);
         }
-
-//        try {
-//            System.out.println(new vtk.vtkVersion().GetVTKVersion());
-////            new vtkJoglPanelComponent();
-//        } catch (Throwable t) {
-//            System.out.println("Could not invoke vtk Methode" +t.getMessage());
-//            t.printStackTrace();
-//        }
     }
 
 	public static void loadGDALLibraries() {
 
-
-//		try {
-//		Runtime.getRuntime().loadLibrary("libgdal");
-//		}  catch (UnsatisfiedLinkError e) {
-//			e.printStackTrace();
-//		}
-
-		System.out.println("SBMTNativeLibraryLoader: loadGDALLibraries: loading all GDAL libs");
     	try {
     		File nativeDir = new File(System.getProperty("user.home") + File.separator +".nativelibs");
 			GDALNativeLibraries.initialize(nativeDir);
@@ -164,7 +149,6 @@ public class SBMTNativeLibraryLoader extends NativeLibraryLoader {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    	System.out.println("SBMTNativeLibraryLoader: loadAllVtkLibraries: unpacking natives");
     	unpackNatives();
 
         if (!EventQueue.isDispatchThread())
@@ -180,27 +164,9 @@ public class SBMTNativeLibraryLoader extends NativeLibraryLoader {
         }
 
 		boolean caughtLinkError = false;
-//		System.out.println("SBMTNativeLibraryLoader: loadGDALLibraries: native before loop " + nativeGDALLibraryDir);
-//		for (gdalNativeLibrary lib : gdalNativeLibrary.values()) {
-//			try {
-////                  if (!lib.IsLoaded())
-//				{
-//					System.out.println("SBMTNativeLibraryLoader: loadGDALLibraries: trying to load "
-//							+ new File(nativeGDALLibraryDir, lib.getFilename() + ".dylib").getAbsolutePath());
-//					Runtime.getRuntime()
-//							.load(new File(nativeGDALLibraryDir, lib.getFilename() + ".dylib").getAbsolutePath());
-////                  	System.load(new File(nativeGDALLibraryDir, lib.getFilename() + ".dylib").getAbsolutePath());
-//
-//				}
-//			} catch (UnsatisfiedLinkError e) {
-//				caughtLinkError = true;
-//				e.printStackTrace();
-//			}
-//		}
 
 		if (caughtLinkError) {
 			throw new UnsatisfiedLinkError("One or more GDAL libraries failed to load");
 		}
 	}
-
 }
