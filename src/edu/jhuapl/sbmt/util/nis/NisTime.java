@@ -1,6 +1,6 @@
 package edu.jhuapl.sbmt.util.nis;
 
-import edu.jhuapl.sbmt.util.TimeUtil;
+import edu.jhuapl.sbmt.core.util.TimeUtil;
 
 public class NisTime
 {

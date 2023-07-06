@@ -50,6 +50,7 @@ import edu.jhuapl.saavtk.util.MathUtil;
 import edu.jhuapl.saavtk.util.NativeLibraryLoader;
 import edu.jhuapl.saavtk.util.PolyDataUtil;
 import edu.jhuapl.saavtk.util.ProgressStatusListener;
+import edu.jhuapl.sbmt.core.util.PolyDataUtil2;
 
 import altwg.Fits.FitsHeaderType;
 import altwg.Fits.HeaderTag;

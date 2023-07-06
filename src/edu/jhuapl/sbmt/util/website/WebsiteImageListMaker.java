@@ -13,11 +13,11 @@ import com.google.common.collect.Lists;
 import edu.jhuapl.saavtk.config.IBodyViewConfig;
 import edu.jhuapl.saavtk.model.ShapeModelBody;
 import edu.jhuapl.saavtk.model.ShapeModelType;
-import edu.jhuapl.sbmt.common.client.SmallBodyViewConfig;
-import edu.jhuapl.sbmt.core.image.ImageSource;
-import edu.jhuapl.sbmt.core.image.ImagingInstrument;
+import edu.jhuapl.sbmt.config.SmallBodyViewConfig;
+import edu.jhuapl.sbmt.core.pointing.PointingSource;
+import edu.jhuapl.sbmt.image.model.ImagingInstrument;
 import edu.jhuapl.sbmt.query.database.GenericPhpQuery;
-import edu.jhuapl.sbmt.tools.SqlManager;
+import edu.jhuapl.sbmt.util.SqlManager;
 
 
 public class WebsiteImageListMaker
@@ -149,7 +149,7 @@ public class WebsiteImageListMaker
             for (ImagingInstrument instrument : config.imagingInstruments) // for example MSI
             {
 
-                for (ImageSource source : instrument.searchImageSources) // pointing (i.e. Gaskell Derived, SPICE)
+                for (PointingSource source : instrument.searchImageSources) // pointing (i.e. Gaskell Derived, SPICE)
                 {
 
                     if (instrument.searchQuery instanceof GenericPhpQuery)

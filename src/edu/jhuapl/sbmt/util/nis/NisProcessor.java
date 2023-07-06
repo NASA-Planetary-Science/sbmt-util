@@ -19,7 +19,7 @@ import vtk.vtkPolyData;
 import vtk.vtkTriangle;
 
 import edu.jhuapl.saavtk.model.GenericPolyhedralModel;
-import edu.jhuapl.sbmt.common.client.ISmallBodyModel;
+import edu.jhuapl.sbmt.core.body.ISmallBodyModel;
 import edu.jhuapl.sbmt.model.eros.nis.NISSpectrum;
 import edu.jhuapl.sbmt.spectrum.rendering.BasicSpectrumRenderer;
 

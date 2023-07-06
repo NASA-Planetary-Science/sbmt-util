@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.jhuapl.sbmt.core.util.BackplaneInfo;
 import edu.jhuapl.sbmt.model.eros.MSIFits;
 
 import altwg.Fits.HeaderTag;

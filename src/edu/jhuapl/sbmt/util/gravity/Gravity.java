@@ -23,8 +23,8 @@ import edu.jhuapl.saavtk.model.PolyhedralModel;
 import edu.jhuapl.saavtk.util.LatLon;
 import edu.jhuapl.saavtk.util.MathUtil;
 import edu.jhuapl.saavtk.util.Point3D;
-import edu.jhuapl.sbmt.common.client.SmallBodyModel;
-import edu.jhuapl.sbmt.util.PolyDataUtil2;
+import edu.jhuapl.sbmt.core.body.SmallBodyModel;
+import edu.jhuapl.sbmt.core.util.PolyDataUtil2;
 import edu.jhuapl.sbmt.util.gravity.ParallelGrid.GridFunction;
 import edu.jhuapl.sbmt.util.gravity.ParallelLoop.LoopFunction;
 

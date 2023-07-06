@@ -20,10 +20,10 @@ import com.google.common.collect.Sets;
 import edu.jhuapl.saavtk.model.ShapeModelBody;
 import edu.jhuapl.saavtk.model.ShapeModelType;
 import edu.jhuapl.saavtk.util.NativeLibraryLoader;
-import edu.jhuapl.sbmt.client2.SbmtModelFactory;
-import edu.jhuapl.sbmt.common.client.SmallBodyModel;
-import edu.jhuapl.sbmt.common.client.SmallBodyViewConfig;
-import edu.jhuapl.sbmt.gui.eros.NISSearchPanel;
+import edu.jhuapl.sbmt.config.SmallBodyViewConfig;
+import edu.jhuapl.sbmt.core.body.SmallBodyModel;
+import edu.jhuapl.sbmt.model.SbmtModelFactory;
+import edu.jhuapl.sbmt.model.eros.nis.NISSearchPanel;
 import edu.jhuapl.sbmt.model.eros.nis.NISSpectrum;
 
 public class NisDataSource
