@@ -44,7 +44,6 @@ import java.util.List;
 
 import edu.jhuapl.saavtk.util.Configuration;
 import edu.jhuapl.saavtk.util.FileUtil;
-import edu.jhuapl.sbmt.client2.SbmtMultiMissionTool;
 import edu.jhuapl.sbmt.core.client.Mission;
 
 
@@ -97,7 +96,7 @@ public class SqlManager
        else
        {
            String dbname = "near";
-           if (SbmtMultiMissionTool.getMission() == Mission.HAYABUSA2_DEPLOY)
+           if (Mission.getMission() == Mission.HAYABUSA2_DEPLOY)
                dbname = "sbmt";
            String dbpath = "jdbc:mysql://" + dbFileNamePrefix + ":3306/" + dbname + "?" + "user=" + username + "&password=" + password;
            System.out.println("Connecting to dbpath: " + dbpath);

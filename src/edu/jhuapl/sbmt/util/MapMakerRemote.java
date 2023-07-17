@@ -29,7 +29,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import edu.jhuapl.saavtk.util.ProgressStatusListener;
-import edu.jhuapl.sbmt.dtm.service.mapmakers.MapmakerRemoteSwingWorker;
 
 
 public class MapMakerRemote
