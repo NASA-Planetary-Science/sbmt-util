@@ -8,14 +8,13 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
-import edu.jhuapl.saavtk.util.NativeLibraryLoader;
-
 import ch.unibas.cs.gravis.gdaljavanativelibs.GDALJavaNativeLibraryException;
 import ch.unibas.cs.gravis.gdaljavanativelibs.GDALNativeLibraries;
 import ch.unibas.cs.gravis.gdaljavanativelibs.GDALNativeLibrariesImpl;
 import ch.unibas.cs.gravis.gdaljavanativelibs.Platform;
 import ch.unibas.cs.gravis.gdaljavanativelibs.Util;
 import ch.unibas.cs.gravis.vtkjavanativelibs.VtkJavaNativeLibraryException;
+import edu.jhuapl.saavtk.util.NativeLibraryLoader;
 
 public class SBMTNativeLibraryLoader extends NativeLibraryLoader {
 
