@@ -17,9 +17,5 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry combineaccessrules="false" kind="src" path="/sbmt-query"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/sbmt-core"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/sbmt-config"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/saavtk"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
