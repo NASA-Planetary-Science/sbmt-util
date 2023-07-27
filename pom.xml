@@ -45,7 +45,7 @@
 	<dependency>
 		<groupId>edu.jhuapl.ses.gdal</groupId>
 		<artifactId>gdal-java-all</artifactId>
-		<version>1.0.0.19</version>
+		<version>1.0.0.45</version>
 	</dependency>
 	<dependency>
 		<groupId>edu.jhuapl.ses.srn.saavtk</groupId>
