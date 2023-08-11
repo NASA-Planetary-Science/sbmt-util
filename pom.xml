@@ -38,7 +38,7 @@
 	    	<dependency>
 				<groupId>edu.jhuapl.ses.gdal</groupId>
 				<artifactId>gdal-java-all</artifactId>
-				<version>1.0.0.46</version>
+				<version>1.0.0.48</version>
 				<exclusions>
 	                <exclusion>
 	                    <groupId>edu.jhuapl.ses.gdal</groupId>
@@ -72,7 +72,7 @@
 	    	<dependency>
 				<groupId>edu.jhuapl.ses.gdal</groupId>
 				<artifactId>gdal-java-all</artifactId>
-				<version>1.0.0.46</version>
+				<version>1.0.0.48</version>
 				<exclusions>
 	                <exclusion>
 	                    <groupId>edu.jhuapl.ses.gdal</groupId>
@@ -106,7 +106,7 @@
 	    	<dependency>
 				<groupId>edu.jhuapl.ses.gdal</groupId>
 				<artifactId>gdal-java-all</artifactId>
-				<version>1.0.0.46</version>
+				<version>1.0.0.48</version>
 				<exclusions>
 	                <exclusion>
 	                    <groupId>edu.jhuapl.ses.gdal</groupId>
@@ -139,7 +139,7 @@
 	    	<dependency>
 				<groupId>edu.jhuapl.ses.gdal</groupId>
 				<artifactId>gdal-java-all</artifactId>
-				<version>1.0.0.46</version>
+				<version>1.0.0.48</version>
 				<exclusions>
 	                <exclusion>
 	                    <groupId>edu.jhuapl.ses.gdal</groupId>
