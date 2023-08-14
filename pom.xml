@@ -25,6 +25,7 @@
   <properties>
 	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	<gdalVersion>1.0.0.50</gdalVersion>
   </properties>
     <profiles>
 	  <profile>
@@ -38,7 +39,7 @@
 	    	<dependency>
 				<groupId>edu.jhuapl.ses.gdal</groupId>
 				<artifactId>gdal-java-all</artifactId>
-				<version>1.0.0.49</version>
+				<version>${gdalVersion}</version>
 				<exclusions>
 	                <exclusion>
 	                    <groupId>edu.jhuapl.ses.gdal</groupId>
@@ -72,7 +73,7 @@
 	    	<dependency>
 				<groupId>edu.jhuapl.ses.gdal</groupId>
 				<artifactId>gdal-java-all</artifactId>
-				<version>1.0.0.49</version>
+				<version>${gdalVersion}</version>
 				<exclusions>
 	                <exclusion>
 	                    <groupId>edu.jhuapl.ses.gdal</groupId>
@@ -106,7 +107,7 @@
 	    	<dependency>
 				<groupId>edu.jhuapl.ses.gdal</groupId>
 				<artifactId>gdal-java-all</artifactId>
-				<version>1.0.0.49</version>
+				<version>${gdalVersion}</version>
 				<exclusions>
 	                <exclusion>
 	                    <groupId>edu.jhuapl.ses.gdal</groupId>
@@ -139,7 +140,7 @@
 	    	<dependency>
 				<groupId>edu.jhuapl.ses.gdal</groupId>
 				<artifactId>gdal-java-all</artifactId>
-				<version>1.0.0.49</version>
+				<version>${gdalVersion}</version>
 				<exclusions>
 	                <exclusion>
 	                    <groupId>edu.jhuapl.ses.gdal</groupId>
