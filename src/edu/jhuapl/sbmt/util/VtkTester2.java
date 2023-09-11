@@ -33,7 +33,7 @@ public class VtkTester2
 	{
 		final boolean usePanel = false;
 
-		NativeLibraryLoader.loadAllVtkLibraries();
+		NativeLibraryLoader.loadVtkLibraries();
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()

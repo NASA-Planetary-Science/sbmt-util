@@ -176,21 +176,6 @@
 		<version>1.82</version>
 	</dependency>
 	<dependency>
-		<groupId>edu.jhuapl.ses.srn.saavtk</groupId>
-		<artifactId>saavtk</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
-	</dependency>
-	<dependency>
-		<groupId>edu.jhuapl.ses.srn.sbmt</groupId>
-		<artifactId>sbmt-core</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
-	</dependency>
-	<dependency>
-		<groupId>edu.jhuapl.ses.srn.sbmt</groupId>
-		<artifactId>sbmt-config</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
-	</dependency>
-	<dependency>
 		<groupId>edu.jhuapl.ses.srn.sbmt</groupId>
 		<artifactId>sbmt-query</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
