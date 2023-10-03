@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>edu.jhuapl.ses.srn.sbmt</groupId>
   <artifactId>sbmt-util</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2-b0-SNAPSHOT</version>
   <name>sbmt-util</name>
   <description>SBMT utility classes</description>
   <packaging>jar</packaging>
@@ -178,7 +178,7 @@
 	<dependency>
 		<groupId>edu.jhuapl.ses.srn.sbmt</groupId>
 		<artifactId>sbmt-query</artifactId>
-		<version>1.0.2</version>
+		<version>1.0.3-b0-SNAPSHOT</version>
 	</dependency>
   </dependencies>
   <build>

@@ -44,11 +44,15 @@ maven verify:
 
 maven deploy:
   stage: deploy
-  script:
+  script:  
     # --- Deploy to artifactory 
     # Again, -fn might be necessary here if artifacts are to be deployed even when unit tests fail
     # -DskipTests will not execute unit tests, this should allow the artifact to be deployed if unit tests fail in the previous stage
     # -Dmaven.test.skip=true will also stop the unit tests from being compiled--which potentially would speed this up
     - mvn $MAVEN_CLI_OPTS -DskipTests clean deploy
-  when: manual
+  rules:
+  - if: '$GITLAB_USER_LOGIN != $RUNNER_USER_LOGIN && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "push"'
+    when: manual
+  - if: '$GITLAB_USER_LOGIN != $RUNNER_USER_LOGIN && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "push"'
+    when: manual
 
