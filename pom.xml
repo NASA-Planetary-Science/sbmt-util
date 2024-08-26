@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>edu.jhuapl.ses.srn.sbmt</groupId>
   <artifactId>sbmt-util</artifactId>
-  <version>1.0.9</version>
+  <version>1.0.10</version>
   <name>sbmt-util</name>
   <description>SBMT utility classes</description>
   <packaging>jar</packaging>
@@ -160,6 +160,11 @@
 	  </profile>
   </profiles>
   <dependencies>
+    <dependency>
+        <groupId>edu.jhuapl.ses</groupId>
+        <artifactId>altwg</artifactId>
+        <version>1.0</version>  
+    </dependency>
   	<dependency>
 		<groupId>org.apache.commons</groupId>
 		<artifactId>commons-lang3</artifactId>
@@ -178,7 +183,7 @@
 	<dependency>
 		<groupId>edu.jhuapl.ses.srn.sbmt</groupId>
 		<artifactId>sbmt-query</artifactId>
-		<version>1.0.6</version>
+		<version>1.0.8</version>
 	</dependency>
   </dependencies>
   <build>
