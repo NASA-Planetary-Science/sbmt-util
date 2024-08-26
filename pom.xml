@@ -25,7 +25,7 @@
   <properties>
 	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-	<gdalVersion>1.0.0.53</gdalVersion>
+	<gdalVersion>1.0.0.55</gdalVersion>
   </properties>
     <profiles>
 	  <profile>
@@ -184,7 +184,7 @@
 	<dependency>
 		<groupId>edu.jhuapl.ses.sbmt</groupId>
 		<artifactId>sbmt-query</artifactId>
-		<version>1.0.0</version>
+		<version>1.0.0</version> 
 	</dependency>
   </dependencies>
   <build>
