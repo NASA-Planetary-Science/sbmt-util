@@ -13,10 +13,8 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
   
-  <organization>
-	<name>Johns Hopkins University Applied Physics Lab</name>
-	<url>https://www.jhuapl.edu</url>
-  </organization>
+  <url>https://github.com/NASA-Planetary-Science/sbmt-util</url>
+
   <distributionManagement>
   	<repository>
 		<id>central</id>
@@ -30,8 +28,6 @@
 	</snapshotRepository>
   </distributionManagement>
   <properties>
-	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	<gdalVersion>3.7.0.0-SNAPSHOT</gdalVersion>
   </properties>
     <profiles>
@@ -170,7 +166,6 @@
     <dependency> 
         <groupId>edu.jhuapl.ses</groupId>
         <artifactId>altwg</artifactId>
-<!--        <version>1.0</version>  -->
     </dependency>
   	<dependency>
 		<groupId>org.apache.commons</groupId>
@@ -185,37 +180,11 @@
 	<dependency>
 		<groupId>com.beust</groupId>
 		<artifactId>jcommander</artifactId>
-<!--		<version>1.82</version>-->
 	</dependency>
 	<dependency>
 		<groupId>edu.jhuapl.ses.srn.sbmt</groupId>
 		<artifactId>sbmt-query</artifactId>
-<!--		<version>1.0.8</version>-->
 	</dependency>
   </dependencies>
-  <build>
-    <sourceDirectory>src</sourceDirectory>
-    <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
-        <configuration>
-          <release>16</release>
-        </configuration>
-      </plugin>
-      <plugin>
-		<groupId>org.apache.maven.plugins</groupId>
-		<artifactId>maven-source-plugin</artifactId>
-		<version>3.2.1</version>
-		<executions>
-			<execution>
-				<id>attach-sources</id>
-				<goals>
-					<goal>jar</goal>
-				</goals>
-			</execution>
-		</executions>
-	  </plugin>
-    </plugins>
-  </build>
+
 </project>
