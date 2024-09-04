@@ -1,20 +1,20 @@
 package edu.jhuapl.sbmt.util;
 
-import static ch.unibas.cs.gravis.gdaljavanativelibs.GDALNativeLibraries.MAJOR_VERSION;
-import static ch.unibas.cs.gravis.gdaljavanativelibs.GDALNativeLibraries.MINOR_VERSION;
+import static edu.jhuapl.ses.gdaljavanativelibs.GDALNativeLibraries.MAJOR_VERSION;
+import static edu.jhuapl.ses.gdaljavanativelibs.GDALNativeLibraries.MINOR_VERSION;
 
 import java.awt.EventQueue;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
-import ch.unibas.cs.gravis.gdaljavanativelibs.GDALJavaNativeLibraryException;
-import ch.unibas.cs.gravis.gdaljavanativelibs.GDALNativeLibraries;
-import ch.unibas.cs.gravis.gdaljavanativelibs.GDALNativeLibrariesImpl;
-import ch.unibas.cs.gravis.gdaljavanativelibs.Platform;
-import ch.unibas.cs.gravis.gdaljavanativelibs.Util;
-import ch.unibas.cs.gravis.vtkjavanativelibs.VtkJavaNativeLibraryException;
 import edu.jhuapl.saavtk.util.NativeLibraryLoader;
+import edu.jhuapl.ses.gdaljavanativelibs.GDALJavaNativeLibraryException;
+import edu.jhuapl.ses.gdaljavanativelibs.GDALNativeLibraries;
+import edu.jhuapl.ses.gdaljavanativelibs.GDALNativeLibrariesImpl;
+import edu.jhuapl.ses.gdaljavanativelibs.Platform;
+import edu.jhuapl.ses.gdaljavanativelibs.Util;
+import edu.jhuapl.ses.vtkjavanativelibs.VtkJavaNativeLibraryException;
 
 public class SBMTNativeLibraryLoader extends NativeLibraryLoader {
 
