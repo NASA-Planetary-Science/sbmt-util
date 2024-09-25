@@ -156,7 +156,7 @@
 	                </exclusion>
             </exclusions>
 			</dependency>
-	    </dependencies>
+	    </dependencies> 
 	  </profile>
   </profiles>
   <dependencies>
