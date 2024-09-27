@@ -34,7 +34,7 @@
     </distributionManagement>
 
     <properties>
-        <gdalVersion>3.7.0.0-SNAPSHOT</gdalVersion>
+        <gdalVersion>3.7.0.0</gdalVersion>
     </properties>
     
     <profiles>
