@@ -226,7 +226,7 @@ public class MapMakerRemote
 			task.execute();
 			while (task.getState() != StateValue.DONE)
 			{
-				try { Thread.currentThread().sleep(5000); }
+				try { Thread.sleep(5000); }
 	            catch(InterruptedException e) {}
 			}
 
@@ -515,7 +515,8 @@ public class MapMakerRemote
         else
         {
             System.out.println("MapMakerRemote: doQuery: got no status");
-            InputStream err = con.getErrorStream();
+            @SuppressWarnings("unused")
+			InputStream err = con.getErrorStream();
             con.disconnect();
             System.exit(0);
             return null;
