@@ -35,7 +35,8 @@ public class MapmakerNativeWrapper implements Runnable
     private double pixelSize;
     private File outputFolder;
     private File mapletFitsFile;
-    private final String processName;
+    @SuppressWarnings("unused")
+	private final String processName;
 
     public MapmakerNativeWrapper(String mapmakerRootDir) throws IOException
     {
@@ -130,7 +131,7 @@ public class MapmakerNativeWrapper implements Runnable
             mapletFitsFile = new File(outputFolder + File.separator + name + ".FIT");
 
             Fits f = new Fits();
-            BasicHDU hdu = FitsFactory.HDUFactory(outdata);
+            BasicHDU<?> hdu = FitsFactory.HDUFactory(outdata);
 
             hdu.getHeader().addValue("PLANE1", "Elevation Relative to Gravity (kilometers)", null);
             hdu.getHeader().addValue("PLANE2", "Elevation Relative to Normal Plane (kilometers)", null);
@@ -154,6 +155,7 @@ public class MapmakerNativeWrapper implements Runnable
                 File origLblFile = new File(mapmakerRootDir + File.separator + "OUTPUT" + File.separator + name + ".lbl");
                 origLblFile.delete();
             }
+            f.close();
         }
         catch (IOException e)
         {
